@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.user.consumer.ConsumerType;
-import model.user.consumer.PremiumConsumer;
+import model.user.consumer.Premium;
 import model.user.consumer.Standard;
 import model.user.producer.Artist;
 import model.user.producer.Creator;
@@ -16,10 +16,6 @@ public class Controller {
 
     public Controller() {
         this.users = new ArrayList<User>();
-    }
-
-    public List<User> getUsers() {
-        return users;
     }
 
     public String getUser(String nickname) {
@@ -51,7 +47,7 @@ public class Controller {
                 msg = addUser(new Standard(nickname, id));
                 break;
             case 1:
-                msg = addUser(new PremiumConsumer(nickname, id));
+                msg = addUser(new Premium(nickname, id));
                 break;
             default:
                 msg = "Invalid type of user";

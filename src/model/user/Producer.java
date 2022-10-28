@@ -1,13 +1,15 @@
-package model;
+package model.user;
 
-public abstract class ProducerUser extends User {
+import model.User;
+
+public abstract class Producer extends User {
 
     private String name;
     private String imageURL;
     private int plays;
     private int playingTime;
 
-    public ProducerUser(String nickname, String name, String imageURL) {
+    public Producer(String nickname, String name, String imageURL) {
         super(nickname);
         this.name = name;
         this.imageURL = imageURL;

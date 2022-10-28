@@ -1,8 +1,10 @@
-package model;
+package model.user.producer;
 
-public final class CreatorProducer extends ProducerUser{
+import model.user.Producer;
 
-    public CreatorProducer(String nickname, String name, String imageURL) {
+public final class Creator extends Producer{
+
+    public Creator(String nickname, String name, String imageURL) {
         super(nickname, name, imageURL);
     }
     

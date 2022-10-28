@@ -1,4 +1,4 @@
-package model;
+package model.user;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -7,14 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ConsumerUser extends User {
+import model.User;
+import model.user.consumer.Preferences;
+
+public abstract class Consumer extends User {
 
     private List<String> playlists;
     private Map<String, Timestamp> purchasedSongs;
     private Preferences preferences;
     private String id;
 
-    public ConsumerUser(String nickname, String id) {
+    public Consumer(String nickname, String id) {
         super(nickname);
         this.id = id;
         this.playlists = new ArrayList<String>();

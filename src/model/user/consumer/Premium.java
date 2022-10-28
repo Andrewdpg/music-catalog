@@ -1,8 +1,10 @@
-package model;
+package model.user.consumer;
 
-public final class PremiumConsumer extends ConsumerUser{
+import model.user.Consumer;
+
+public final class Premium extends Consumer{
     
-    public PremiumConsumer(String nickname, String id) {
+    public Premium(String nickname, String id) {
         super(nickname, id);
     }
 }
