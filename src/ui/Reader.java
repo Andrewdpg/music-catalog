@@ -10,6 +10,8 @@ public class Reader {
         int value = -1;
         if(scn.hasNextInt()){
             value = scn.nextInt();
+        }else{
+            scn.next();
         }
         return value;
     }
