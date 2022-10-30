@@ -1,6 +1,9 @@
 
 package ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.Controller;
 import model.User;
 import model.audio.podcast.Category;
@@ -22,6 +25,7 @@ public class Menu {
             "1. Add producer.\n" +
             "2. Add consumer.\n" +
             "3. Add an audio.\n" +
+            "4. Create a playlist.\n" +
             "Input: ";
 
     public Menu() {
@@ -53,11 +57,55 @@ public class Menu {
             case 3:
                 msg = registerAudio();
                 break;
+            case 4:
+                msg = createPlaylist();
+                break;
             default:
                 msg = "Invalid option.";
                 break;
         }
         System.out.println(msg);
+    }
+
+    private String createPlaylist() {
+        String msg = null;
+
+        String nickname = readUserNickname();
+
+        List<Class<?>> audioTypes = new ArrayList<>();
+        Class<?>[] classes = controller.getAudioClasses();
+
+        String classesMenu = "\nWhich type of audios will it have? \n";
+        for (int i = 1; i <= classes.length; i++) {
+            classesMenu += i + ". " + classes[i - 1].getSimpleName() + "\n";
+        }
+        classesMenu += "\n0. Done.";
+        System.out.println(classesMenu);
+
+        int input = -1;
+        do {
+            try {
+                System.out.print("Input: ");
+                input = Reader.readInt();
+                if (input != 0) {
+                    if (!audioTypes.contains(classes[input - 1])) {
+                        audioTypes.add(classes[input - 1]);
+                        System.out.println("- " + classes[input - 1].getSimpleName() + ": added");
+                    } else {
+                        audioTypes.remove(classes[input - 1]);
+                        System.out.println("- " + classes[input - 1].getSimpleName() + ": removed");
+                    }
+                } else if (audioTypes.isEmpty()) {
+                    input = -1;
+                    System.out.println("You must select at least 1 type of audio.");
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input");
+            }
+        } while (input != 0);
+
+        msg = controller.registerPlaylist(nickname, classesMenu, audioTypes);
+        return msg;
     }
 
     private String registerAudio() {
@@ -74,8 +122,8 @@ public class Menu {
             String imageURL = Reader.readString();
 
             if (user instanceof Artist) {
-                System.out.print("What's the genre of the song?\n" + controller.getSongGenres());
-                Object type = validateGenre(Reader.readInt());
+                System.out.print("What's the genre of the song?\n" + controller.getEnumTypes(Genre.class));
+                Object type = validateType(Reader.readInt(), Genre.class);
 
                 msg = type instanceof Genre ? controller.registerSong(name, duration, imageURL, (Genre) type, nickname)
                         : String.valueOf(type);
@@ -83,8 +131,8 @@ public class Menu {
             } else if (user instanceof Creator) {
                 System.out.print("Give a brief description: ");
                 String description = Reader.readString();
-                System.out.print("What's the podcast category?\n" + controller.getPodcastCategories());
-                Object type = validateCategory(Reader.readInt());
+                System.out.print("What's the podcast category?\n" + controller.getEnumTypes(Category.class));
+                Object type = validateType(Reader.readInt(), Category.class);
 
                 msg = type instanceof Genre
                         ? controller.registerPodcast(name, duration, imageURL, description, (Category) type, nickname)
@@ -95,72 +143,50 @@ public class Menu {
     }
 
     private String readUserNickname() {
-        System.out.println("What's your nickname?");
+        System.out.print("Nickname: ");
         return Reader.readString();
     }
 
     private String registerConsumer() {
-        System.out.print("What's its nickname? ");
-        String nickname = Reader.readString();
+        String nickname = readUserNickname();
         System.out.print("What's its id? ");
         String id = Reader.readString();
-        System.out.print(controller.getConsumerTypes());
-        Object type = validateConsumerType(Reader.readInt());
+        System.out.print(controller.getEnumTypes(ConsumerType.class));
+        Object type = validateType(Reader.readInt(), ConsumerType.class);
 
         return type instanceof ConsumerType ? controller.addConsumer(nickname, id, (ConsumerType) type)
                 : String.valueOf(type);
     }
 
     private String registerProducer() {
-        System.out.print("What's its nickname? ");
-        String nickname = Reader.readString();
+        String nickname = readUserNickname();
         System.out.print("What's its name? ");
         String name = Reader.readString();
         System.out.print("Profile photo URL: ");
         String imageURL = Reader.readString();
-        System.out.print(controller.getProducerTypes());
-        Object type = validateProducerType(Reader.readInt());
+        System.out.print(controller.getEnumTypes(ProducerType.class));
+        Object type = validateType(Reader.readInt(), ProducerType.class);
 
         return type instanceof ProducerType ? controller.addProducer(nickname, name, imageURL, (ProducerType) type)
                 : String.valueOf(type);
     }
 
-    private Object validateConsumerType(int typeValue) {
+    private Object validateType(int typeValue, Class<?> classType) {
         Object result = null;
         try {
-            result = ConsumerType.values()[typeValue];
+            if (classType == ProducerType.class) {
+                result = ProducerType.values()[typeValue];
+            } else if (classType == ConsumerType.class) {
+                result = ConsumerType.values()[typeValue];
+            } else if (classType == Genre.class) {
+                result = Genre.values()[typeValue];
+            } else if (classType == Category.class) {
+                result = Category.values()[typeValue];
+            } else {
+                result = "Invalid entity";
+            }
         } catch (Exception e) {
-            result = "Invalid type of consumer";
-        }
-        return result;
-    }
-
-    private Object validateProducerType(int typeValue) {
-        Object result = null;
-        try {
-            result = ProducerType.values()[typeValue];
-        } catch (Exception e) {
-            result = "Invalid type of producer";
-        }
-        return result;
-    }
-
-    private Object validateGenre(int typeValue) {
-        Object result = null;
-        try {
-            result = Genre.values()[typeValue];
-        } catch (Exception e) {
-            result = "Invalid genre";
-        }
-        return result;
-    }
-
-    private Object validateCategory(int typeValue) {
-        Object result = null;
-        try {
-            result = Category.values()[typeValue];
-        } catch (Exception e) {
-            result = "Invalid category";
+            result = "Value not supported";
         }
         return result;
     }

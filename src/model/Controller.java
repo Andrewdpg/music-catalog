@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.audio.Playlist;
 import model.audio.Podcast;
 import model.audio.Song;
 import model.audio.podcast.Category;
@@ -18,10 +19,12 @@ public class Controller {
 
     private List<User> users;
     private List<Audio> audios;
+    private List<Playlist> playlists;
 
     public Controller() {
         this.users = new ArrayList<User>();
         this.audios = new ArrayList<Audio>();
+        this.playlists = new ArrayList<Playlist>();
     }
 
     public User getUser(String nickname) {
@@ -104,36 +107,35 @@ public class Controller {
         return msg;
     }
 
-    public String getConsumerTypes() {
-        String msg = "";
-        for (int i = 0; i < ConsumerType.values().length; i++) {
-            msg += i + ". " + ConsumerType.values()[i] + "\n";
+    public String registerPlaylist(String userNickname, String name, List<Class<?>> audioTypes) {
+        String msg = "Non-existent user";
+        if (userExist(userNickname)) {
+            msg = "The playlist could not be added.";
+            int type = 0;
+            for (Class<?> classType : audioTypes) {
+                if (classType == Song.class) {
+                    type += 1;
+                }
+                if (classType == Podcast.class) {
+                    type += 2;
+                }
+            }
+            if (playlists.add(new Playlist(userNickname, name, type))) {
+                msg = "Playlist successfully created";
+            }
         }
         return msg;
     }
 
-    public String getProducerTypes() {
+    public String getEnumTypes(Class<?> classType) {
         String msg = "";
-        for (int i = 0; i < ProducerType.values().length; i++) {
-            msg += i + ". " + ProducerType.values()[i] + "\n";
+        for (int i = 0; i < classType.getEnumConstants().length; i++) {
+            msg += i + ". " + classType.getEnumConstants()[i] + "\n";
         }
         return msg;
     }
 
-    public String getSongGenres() {
-        String msg = "";
-        for (int i = 0; i < Genre.values().length; i++) {
-            msg += i + ". " + Genre.values()[i] + "\n";
-        }
-        return msg;
+    public Class<?>[] getAudioClasses() {
+        return Audio.children;
     }
-
-    public String getPodcastCategories() {
-        String msg = "";
-        for (int i = 0; i < Category.values().length; i++) {
-            msg += i + ". " + Category.values()[i] + "\n";
-        }
-        return msg;
-    }
-
 }

@@ -1,5 +1,8 @@
 package model;
 
+import model.audio.Podcast;
+import model.audio.Song;
+
 public abstract class Audio {
 
     private String name;
@@ -7,7 +10,7 @@ public abstract class Audio {
     private String owner;
     private int duration;
 
-    
+    public static final Class<?>[] children = {Song.class, Podcast.class};
 
     public Audio(String name, String imageURL, String owner, int duration) {
         this.name = name;
