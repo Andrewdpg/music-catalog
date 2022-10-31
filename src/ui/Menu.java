@@ -4,8 +4,10 @@ package ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Audio;
 import model.Controller;
 import model.User;
+import model.audio.Playlist;
 import model.audio.podcast.Category;
 import model.audio.song.Genre;
 import model.user.Producer;
@@ -26,7 +28,16 @@ public class Menu {
             "2. Add consumer.\n" +
             "3. Add an audio.\n" +
             "4. Create a playlist.\n" +
+            "5. Edit a playlist.\n" +
+            "0. Exit.\n" +
             "Input: ";
+    private static final String EDITING_PLAYLIST_MENU = "1. Add audio.\n" +
+            "2. Remove audio.\n" +
+            "3. Change name.\n" +
+            "4. Change audio position.\n" +
+            "5. Show playlist.\n" +
+            "6. Delete playlist.\n" +
+            "0. Done.";
 
     public Menu() {
         option = -1;
@@ -60,6 +71,12 @@ public class Menu {
             case 4:
                 msg = createPlaylist();
                 break;
+            case 5:
+                msg = editPlaylist();
+                break;
+            case 0:
+                msg = "Closing....";
+                break;
             default:
                 msg = "Invalid option.";
                 break;
@@ -67,10 +84,143 @@ public class Menu {
         System.out.println(msg);
     }
 
+    private String editPlaylist() {
+        String msg = "Non-existent user";
+        String nickname = readUserNickname();
+
+        List<Playlist> playlists = controller.getUserPlaylist(nickname);
+        if (playlists != null) {
+            int input = -1;
+            do {
+                msg = "This user has no playlists.";
+                if (playlists.size() != 0) {
+                    try {
+                        msg = "\n" + nickname + "'s playlists: \n";
+                        for (int i = 1; i <= playlists.size(); i++) {
+                            msg += i + ". " + playlists.get(i - 1).getName() + "\n";
+                        }
+                        msg += "0. exit.";
+                        System.out.println(msg);
+                        System.out.print("Input: ");
+                        input = Reader.readInt();
+                        if (input != 0) {
+                            Playlist selectedPlaylist = playlists.get(input - 1);
+                            System.out.println(executeEditPlaylist(selectedPlaylist, nickname));
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Invalid input");
+                    }
+                } else {
+                    input = 0;
+                }
+            } while (input != 0);
+        }
+        return msg;
+    }
+
+    private String executeEditPlaylist(Playlist selectedPlaylist, String nickname) {
+        String msg = "";
+        System.out.print("\nEditing " + selectedPlaylist.getName() + "\n" + EDITING_PLAYLIST_MENU
+                + "\nInput: ");
+        int input = Reader.readInt();
+
+        switch (input) {
+            case 1:
+                msg = addAudioToPlaylist(nickname, selectedPlaylist);
+                break;
+            case 2:
+                msg = removeAudioFromPlaylist(nickname, selectedPlaylist);
+                break;
+            case 3:
+                msg = changeNameToPlaylist(nickname, selectedPlaylist);
+                break;
+            case 4:
+                msg = changeAudioPositionFrom(nickname, selectedPlaylist);
+                break;
+            case 5:
+                msg = "\n" + selectedPlaylist.toString();
+                break;
+            case 6:
+                msg = deletePlaylistOf(nickname, selectedPlaylist);
+            case 0:
+                break;
+            default:
+                msg = "Invalid input";
+                break;
+        }
+        return msg;
+    }
+
+    private String addAudioToPlaylist(String nickname, Playlist selectedPlaylist) {
+        String msg = "";
+        List<Audio> availableAudios = controller.audiosForUser(nickname,
+                selectedPlaylist.getAudioTypes(),
+                selectedPlaylist.getId());
+        String audioList = "\nList of available audios: \n";
+        for (int i = 1; i <= availableAudios.size(); i++) {
+            audioList += i + ". " + availableAudios.get(i - 1).getName() + "\n";
+        }
+        audioList += "0. Cancel";
+        System.out.print(audioList + "\nInput: ");
+        int input = Reader.readInt();
+        if (input != 0) {
+            msg = controller.addAudioToUserPlaylist(nickname, selectedPlaylist.getId(),
+                    availableAudios.get(input - 1).getId());
+        }
+        return msg;
+    }
+
+    public String removeAudioFromPlaylist(String nickname, Playlist selectedPlaylist) {
+        String msg = "";
+        System.out.print("\n" + selectedPlaylist.toString() + "0. Cancel. \nInput: ");
+        int input = Reader.readInt();
+        if (input != 0) {
+            msg = controller.removeAudioFromUserPlaylist(nickname, selectedPlaylist.getId(),
+                    selectedPlaylist.getAudios().get(input - 1).getId());
+        }
+        return msg;
+    }
+
+    public String changeNameToPlaylist(String nickname, Playlist selectedPlaylist) {
+        System.out.print("New name: ");
+        String newName = Reader.readString();
+        return controller.changeNameToUserPlaylist(nickname, selectedPlaylist.getId(), newName);
+    }
+
+    public String changeAudioPositionFrom(String nickname, Playlist selectedPlaylist) {
+        System.out.print("\n" + selectedPlaylist.toString() + "0. Cancel. \nInput: ");
+        int oldPosition = Reader.readInt();
+        System.out.print("New position: ");
+        int newPosition = Reader.readInt();
+
+        String msg = "Invalid positions.";
+        if (newPosition >= 1 && newPosition <= selectedPlaylist.getAudios().size() && oldPosition >= 1
+                && oldPosition <= selectedPlaylist.getAudios().size()) {
+            msg = controller.changePositions(nickname, selectedPlaylist.getId(), oldPosition - 1, newPosition - 1);
+        }
+        return msg;
+    }
+
+    public String deletePlaylistOf(String nickname, Playlist selectedPlaylist) {
+        System.out.print(
+                "\nAre you sure to delete " + selectedPlaylist.getName()
+                        + " playlist?\n0: Confirm.\nAny other key: Cancel.\nInput: ");
+        String input = Reader.readString();
+
+        String msg = "Operation canceled";
+        if (input.equals("0")) {
+            msg = controller.deletePlaylistOf(nickname, selectedPlaylist.getId());
+        }
+        return msg;
+    }
+
     private String createPlaylist() {
         String msg = null;
 
         String nickname = readUserNickname();
+
+        System.out.print("What will be its name? ");
+        String name = Reader.readString();
 
         List<Class<?>> audioTypes = new ArrayList<>();
         Class<?>[] classes = controller.getAudioClasses();
@@ -104,7 +254,7 @@ public class Menu {
             }
         } while (input != 0);
 
-        msg = controller.registerPlaylist(nickname, classesMenu, audioTypes);
+        msg = controller.registerPlaylist(nickname, name, audioTypes);
         return msg;
     }
 

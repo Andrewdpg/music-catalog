@@ -4,64 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Audio;
-import model.UtilMatrix;
 
 public class Playlist {
 
     private String id;
     private List<Audio> audios;
-    private String owner;
     private String name;
     private int[][] matrix;
+    private final List<Class<?>> audioTypes;
 
-    public Playlist(String owner, String name, int codeType) {
+    public Playlist(String name, List<Class<?>> audioTypes, int[][] matrix, String code) {
         this.audios = new ArrayList<Audio>();
         this.name = name;
-        this.owner = owner;
-        this.id = generateCode(codeType);
+        this.audioTypes = audioTypes;
+        this.matrix = matrix;
+        this.id = code;
     }
 
-    public String generateCode(int type) {
-        String code = "";
-        this.matrix = UtilMatrix.randomMatrix(6, 6);
-
-        switch (type) {
-            case 1:
-                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 0, 5, 1);
-                code += UtilMatrix.dLine(matrix, UtilMatrix.DOWN, UtilMatrix.RIGHT, 0, 0, 1);
-                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 5, 5, 0);
-                break;
-            case 2:
-                code += UtilMatrix.hLine(matrix, UtilMatrix.RIGHT, 0, 0, -3);
-                code += UtilMatrix.vLine(matrix, UtilMatrix.DOWN, 2, 1, 0);
-                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 3, 5, -1);
-                code += UtilMatrix.hLine(matrix, UtilMatrix.RIGHT, 3, 0, 0);
-                break;
-            case 3:
-                for (int i = 5; i >= 0 && code.length() < 16; i--) {
-                    for (int j = 5; j >= 0 && code.length() < 16; j--) {
-                        if ((i + j) % 2 != 0 && (i + j) > 1) {
-                            code += matrix[i][j];
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
+    public boolean removeAudio(String id) {
+        boolean isRemoved = false;
+        for (int i = 0; i < audios.size(); i++) {
+            if (audios.get(i).getId().equals(id)) {
+                isRemoved = audios.remove(audios.get(i));
+            }
         }
-        return code;
+        return isRemoved;
     }
 
     public boolean addAudio(Audio audio) {
         return audios.add(audio);
     }
 
-    public List<Audio> getAudios() {
-        return audios;
+    public boolean removeAudio(Audio audio) {
+        return audios.remove(audio);
     }
 
-    public String getOwner() {
-        return owner;
+    public List<Audio> getAudios() {
+        return audios;
     }
 
     public String getName() {
@@ -86,6 +65,25 @@ public class Playlist {
             matrixS += "\n";
         }
         return matrixS;
+    }
+
+    public List<Class<?>> getAudioTypes() {
+        return audioTypes;
+    }
+
+    @Override
+    public String toString() {
+        String value = "Playlist name: " + name + " - ID: " + id + "\n";
+
+        for (int i = 0; i < audios.size(); i++) {
+            value += (i + 1) + ". " + audios.get(i).toString() + "\n";
+        }
+        return value;
+    }
+
+    public void changeAudioPosition(int oldPosition,int newPosition) {
+        Audio audio = audios.remove(oldPosition);
+        audios.add(newPosition, audio);
     }
 
 }

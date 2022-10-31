@@ -83,4 +83,34 @@ public class UtilMatrix {
 
         }
     }
+
+    public static String generateCode(int type, int[][] matrix) {
+        String code = "";
+
+        switch (type) {
+            case 1:
+                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 0, 5, 1);
+                code += UtilMatrix.dLine(matrix, UtilMatrix.DOWN, UtilMatrix.RIGHT, 0, 0, 1);
+                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 5, 5, 0);
+                break;
+            case 2:
+                code += UtilMatrix.hLine(matrix, UtilMatrix.RIGHT, 0, 0, -3);
+                code += UtilMatrix.vLine(matrix, UtilMatrix.DOWN, 2, 1, 0);
+                code += UtilMatrix.vLine(matrix, UtilMatrix.UP, 3, 5, -1);
+                code += UtilMatrix.hLine(matrix, UtilMatrix.RIGHT, 3, 0, 0);
+                break;
+            case 3:
+                for (int i = 5; i >= 0 && code.length() < 16; i--) {
+                    for (int j = 5; j >= 0 && code.length() < 16; j--) {
+                        if ((i + j) % 2 != 0 && (i + j) > 1) {
+                            code += matrix[i][j];
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return code;
+    }
 }

@@ -8,15 +8,17 @@ public abstract class Audio {
     private String name;
     private String imageURL;
     private String owner;
+    private String id;
     private int duration;
 
-    public static final Class<?>[] children = {Song.class, Podcast.class};
+    public static final Class<?>[] children = { Song.class, Podcast.class };
 
     public Audio(String name, String imageURL, String owner, int duration) {
         this.name = name;
         this.imageURL = imageURL;
         this.owner = owner;
         this.duration = duration;
+        this.id = UtilMatrix.generateCode(1, UtilMatrix.randomMatrix(6, 6));
     }
 
     public String getName() {
@@ -51,4 +53,13 @@ public abstract class Audio {
         this.owner = owner;
     }
 
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        String value = name +  " - by: " + owner;
+        return value;
+    }
 }
