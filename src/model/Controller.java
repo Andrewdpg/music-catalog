@@ -93,7 +93,7 @@ public class Controller {
         return audio;
     }
 
-    public String addConsumer(String nickname, String id, ConsumerType type) {
+    public String createConsumer(String nickname, String id, ConsumerType type) {
         String msg;
         switch (type) {
             case STANDARD:
@@ -109,9 +109,8 @@ public class Controller {
         return msg;
     }
 
-    public String addProducer(String nickname, String name, String imageURL, ProducerType type) {
+    public String createProducer(String nickname, String name, String imageURL, ProducerType type) {
         String msg;
-
         switch (type) {
             case ARTIST:
                 msg = addUser(new Artist(nickname, name, imageURL));

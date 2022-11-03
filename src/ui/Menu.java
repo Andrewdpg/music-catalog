@@ -304,7 +304,7 @@ public class Menu {
         System.out.print(controller.getEnumTypes(ConsumerType.class));
         Object type = validateType(Reader.readInt(), ConsumerType.class);
 
-        return type instanceof ConsumerType ? controller.addConsumer(nickname, id, (ConsumerType) type)
+        return type instanceof ConsumerType ? controller.createConsumer(nickname, id, (ConsumerType) type)
                 : String.valueOf(type);
     }
 
@@ -317,7 +317,7 @@ public class Menu {
         System.out.print(controller.getEnumTypes(ProducerType.class));
         Object type = validateType(Reader.readInt(), ProducerType.class);
 
-        return type instanceof ProducerType ? controller.addProducer(nickname, name, imageURL, (ProducerType) type)
+        return type instanceof ProducerType ? controller.createProducer(nickname, name, imageURL, (ProducerType) type)
                 : String.valueOf(type);
     }
 

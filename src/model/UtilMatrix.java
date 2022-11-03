@@ -74,7 +74,7 @@ public class UtilMatrix {
             int[][] matrix = new int[rows][columns];
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length; j++) {
-                    matrix[i][j] = rand.nextInt(0, 10);
+                    matrix[i][j] = rand.nextInt(10);
                 }
             }
             return matrix;
