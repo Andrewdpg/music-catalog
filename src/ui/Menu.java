@@ -108,7 +108,7 @@ public class Menu {
         String msg = "Non-existent user";
         String nickname = readUserNickname();
 
-        List<Playlist> playlists = controller.getUserPlaylist(nickname);
+        List<Playlist> playlists = controller.getUserPlaylists(nickname);
         if (playlists != null) {
             int input = -1;
             do {
