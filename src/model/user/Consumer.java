@@ -28,6 +28,12 @@ public abstract class Consumer extends User {
         this.preferences = new Preferences();
     }
 
+    /**
+     * Adds a new playlist to this user
+     * 
+     * @param newPlaylist playlist to be added
+     * @return boolean with the result
+     */
     public boolean addPlaylist(Playlist newPlaylist) {
         boolean isAdded = false;
         if (canCreateAPlaylist()) {
@@ -40,6 +46,12 @@ public abstract class Consumer extends User {
         return playlists;
     }
 
+    /**
+     * Looks for a playlist by its id
+     * 
+     * @param id playlist's id
+     * @return A playlist object in case of it's found. null otherwise.
+     */
     public Playlist getPlaylist(String id) {
         int pos = getPlaylistPos(id);
         Playlist list = null;
@@ -49,6 +61,12 @@ public abstract class Consumer extends User {
         return list;
     }
 
+    /**
+     * Returns a playlist position in the list
+     * 
+     * @param id playlist's id
+     * @return position of the playlist. -1 if it isn't found.
+     */
     public int getPlaylistPos(String id) {
         int pos = -1;
         for (int i = 0; i < playlists.size() && pos == -1; i++) {
@@ -91,6 +109,13 @@ public abstract class Consumer extends User {
         return purchasedSongs.containsKey(id);
     }
 
+    /**
+     * Adds a new audio to a specific playlist
+     * 
+     * @param playlistId playlist where the audio is going to be added.
+     * @param audio      Audio to be added.
+     * @return A message with the final result.
+     */
     private String addAudioToPlaylist(String playlistId, Audio audio) {
         String msg = "Playlist not found.";
         int pos = getPlaylistPos(playlistId);
@@ -102,6 +127,14 @@ public abstract class Consumer extends User {
         return msg;
     }
 
+    /**
+     * Adds an audio to a specific playlist, validating first, in case it is a song,
+     * that the user owns it.
+     * 
+     * @param playlistId Playlist where the audio is going to be added.
+     * @param audio      Audio to be added
+     * @return A message with the final result
+     */
     public String addAudioTo(String playlistId, Audio audio) {
         String msg = "The user havent purchased this song";
         if (audio instanceof Song) {
@@ -114,6 +147,13 @@ public abstract class Consumer extends User {
         return msg;
     }
 
+    /**
+     * Removes an audio from a playlist
+     * 
+     * @param playlistId Playlist to be edited
+     * @param audio      Audio to be deleted
+     * @return A message with the final result
+     */
     public String removeAudioFrom(String playlistId, Audio audio) {
         int pos = getPlaylistPos(playlistId);
         String msg = "Playlist not found.";
@@ -125,6 +165,13 @@ public abstract class Consumer extends User {
         return msg;
     }
 
+    /**
+     * Looks for a playlist and changes its name
+     * 
+     * @param playlistId Playlist to me renamed
+     * @param newName    new name for the playlist
+     * @return A string with the final result
+     */
     public String changeNameTo(String playlistId, String newName) {
         int pos = getPlaylistPos(playlistId);
         String msg = "Playlist not found.";
@@ -135,6 +182,14 @@ public abstract class Consumer extends User {
         return msg;
     }
 
+    /**
+     * Looks for a playlist and changes an audio position in it.
+     * 
+     * @param playlistId  playlist to be edited
+     * @param oldPosition position of the audio to be moved
+     * @param newPosition new position for the audio
+     * @return A message with the final result
+     */
     public String changePositionOf(String playlistId, int oldPosition, int newPosition) {
         int pos = getPlaylistPos(playlistId);
         String msg = "Playlist not found.";
@@ -145,6 +200,12 @@ public abstract class Consumer extends User {
         return msg;
     }
 
+    /**
+     * Looks for a playlist and deletes it
+     * 
+     * @param playlistId Playlist to be deleted
+     * @return A message with the final result
+     */
     public String deletePlaylist(String playlistId) {
         int pos = getPlaylistPos(playlistId);
         String msg = "Playlist not found.";
