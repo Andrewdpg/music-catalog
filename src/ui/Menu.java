@@ -23,6 +23,7 @@ public class Menu {
 
     private Controller controller;
     private int option;
+    // Main menu options
     private static final String MENU = "\n\n<< Spotify pirata >>\n" +
             "1. Add producer.\n" +
             "2. Add consumer.\n" +
@@ -31,6 +32,7 @@ public class Menu {
             "5. Edit a playlist.\n" +
             "0. Exit.\n" +
             "Input: ";
+    // Options for editing a playlist.
     private static final String EDITING_PLAYLIST_MENU = "1. Add audio.\n" +
             "2. Remove audio.\n" +
             "3. Change name.\n" +
@@ -44,18 +46,30 @@ public class Menu {
         controller = new Controller();
     }
 
+    /**
+     * Returns menu's state (alive or closed)
+     */
     public boolean isAlive() {
         return this.option != 0;
     }
 
+    /**
+     * Reads user's selection
+     */
     public void readOption() {
         this.option = Reader.readInt();
     }
 
+    /**
+     * Shows the main menu
+     */
     public void showMenu() {
         System.out.print(MENU);
     }
 
+    /**
+     * Executes menu's current selected option.
+     */
     public void executeOption() {
         String msg = "";
         switch (option) {
@@ -84,6 +98,12 @@ public class Menu {
         System.out.println(msg);
     }
 
+    /**
+     * Ask for an user's nickname, shows its playlists and a menu with option for
+     * editing them
+     * 
+     * @return A message with an ending operation
+     */
     private String editPlaylist() {
         String msg = "Non-existent user";
         String nickname = readUserNickname();
@@ -118,6 +138,13 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Reads and executes an option for editing a playlist
+     * 
+     * @param selectedPlaylist user's selected playlist
+     * @param nickname         user's nickname
+     * @return message with the resulting operation
+     */
     private String executeEditPlaylist(Playlist selectedPlaylist, String nickname) {
         String msg = "";
         System.out.print("\nEditing " + selectedPlaylist.getName() + "\n" + EDITING_PLAYLIST_MENU
@@ -151,6 +178,14 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Lists all available audios (podcasts and bought songs) for current user and
+     * asks for the user to select which one to add to the selected playlist.
+     * 
+     * @param nickname         user's nickname
+     * @param selectedPlaylist user's selected playlist
+     * @return a message with the final result
+     */
     private String addAudioToPlaylist(String nickname, Playlist selectedPlaylist) {
         String msg = "";
         List<Audio> availableAudios = controller.audiosForUser(nickname,
@@ -170,6 +205,14 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Lists all audios in selected playlist and asks to the user which one to
+     * delete from it.
+     * 
+     * @param nickname         user's nickname
+     * @param selectedPlaylist user's selected playlist
+     * @return a message with the final result
+     */
     public String removeAudioFromPlaylist(String nickname, Playlist selectedPlaylist) {
         String msg = "";
         System.out.print("\n" + selectedPlaylist.toString() + "0. Cancel. \nInput: ");
@@ -181,12 +224,27 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Allows the user to rename the current playlist
+     * 
+     * @param nickname         user's nickname
+     * @param selectedPlaylist user's selected playlist
+     * @return a message with the final result
+     */
     public String changeNameToPlaylist(String nickname, Playlist selectedPlaylist) {
         System.out.print("New name: ");
         String newName = Reader.readString();
         return controller.changeNameToUserPlaylist(nickname, selectedPlaylist.getId(), newName);
     }
 
+    /**
+     * Lists all audios in selected playlist and allows the user to change one os
+     * them's position in playlist.
+     * 
+     * @param nickname         user's nickname
+     * @param selectedPlaylist user's selected playlist
+     * @return a message with the final result
+     */
     public String changeAudioPositionFrom(String nickname, Playlist selectedPlaylist) {
         System.out.print("\n" + selectedPlaylist.toString() + "0. Cancel. \nInput: ");
         int oldPosition = Reader.readInt();
@@ -201,6 +259,13 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Asks to the user to confirm the deleting operation and executes it.
+     * 
+     * @param nickname         user's nickname
+     * @param selectedPlaylist user's selected playlist
+     * @return a message with the final result
+     */
     public String deletePlaylistOf(String nickname, Playlist selectedPlaylist) {
         System.out.print(
                 "\nAre you sure to delete " + selectedPlaylist.getName()
@@ -214,6 +279,12 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Asks for a customer user and a new playlist's data to send a petition for
+     * creating it.
+     * 
+     * @return a message with the result of this operation
+     */
     private String createPlaylist() {
         String msg = null;
 
@@ -258,6 +329,12 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Asks for a producer type user and a new audio to be registered. Them it sends
+     * the petition to the controller.
+     * 
+     * @return a message with controller response.
+     */
     private String registerAudio() {
         String msg = "this user is not a producer.";
         String nickname = readUserNickname();
@@ -292,6 +369,11 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Reads an users's nickname
+     * 
+     * @return read nickname
+     */
     private String readUserNickname() {
         System.out.print("Nickname: ");
         return Reader.readString();
@@ -308,6 +390,11 @@ public class Menu {
                 : String.valueOf(type);
     }
 
+    /**
+     * Sends to controller a registering petition of a new producer type user.
+     * 
+     * @return message with controller's response
+     */
     private String registerProducer() {
         String nickname = readUserNickname();
         System.out.print("What's its name? ");
@@ -321,6 +408,19 @@ public class Menu {
                 : String.valueOf(type);
     }
 
+    /**
+     * Validates if a type of user (consumer or producer) or classification of audio
+     * (podcast category or song genre) actually exists.
+     * 
+     * Using their respective enums tries to select the one the user selected.
+     * In case it fails, a message will be returned. Otherwise it will return the
+     * enum value of user's selection.
+     * 
+     * @param typeValue input of the user (the enum value it selected).
+     * @param classType class of the enum it will validate (ProducerType,
+     *                  ConsumerType, Genre or Category).
+     * @return An enum object in case of success. A String message otherwise.
+     */
     private Object validateType(int typeValue, Class<?> classType) {
         Object result = null;
         try {
