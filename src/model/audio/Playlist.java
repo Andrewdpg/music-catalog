@@ -21,6 +21,12 @@ public class Playlist {
         this.id = code;
     }
 
+    /**
+     * Removes an audio from the list
+     * 
+     * @param id id of the audio to remove
+     * @return True in case of success. False otherwise.
+     */
     public boolean removeAudio(String id) {
         boolean isRemoved = false;
         for (int i = 0; i < audios.size(); i++) {
@@ -31,6 +37,12 @@ public class Playlist {
         return isRemoved;
     }
 
+    /**
+     * Adds an audio to the list
+     * 
+     * @param audio Audio to be added
+     * @return True in case of success. False otherwise.
+     */
     public boolean addAudio(Audio audio) {
         return audios.add(audio);
     }
@@ -55,6 +67,11 @@ public class Playlist {
         return id;
     }
 
+    /**
+     * Returns a String with the matrix data.
+     * 
+     * @return String with the matrix
+     */
     public String getMatrix() {
         String matrixS = "";
 
@@ -67,6 +84,11 @@ public class Playlist {
         return matrixS;
     }
 
+    /**
+     * List of classes which can be added to this playlist
+     * 
+     * @return List of "supported" classes
+     */
     public List<Class<?>> getAudioTypes() {
         return audioTypes;
     }
@@ -81,7 +103,13 @@ public class Playlist {
         return value;
     }
 
-    public void changeAudioPosition(int oldPosition,int newPosition) {
+    /**
+     * Moves an audio to a new position in the list
+     * 
+     * @param oldPosition position of the audio to be moved
+     * @param newPosition new position
+     */
+    public void changeAudioPosition(int oldPosition, int newPosition) {
         Audio audio = audios.remove(oldPosition);
         audios.add(newPosition, audio);
     }

@@ -13,6 +13,16 @@ public class UtilMatrix {
     public static final int DOWN = 0;
     public static final int UP = 1;
 
+    /**
+     * Returns a straight vertical line of a matrix data
+     * 
+     * @param matrix    matrix to be traversed
+     * @param direction direction of the line (Up or down)
+     * @param xStart    initial x (row) position for the line
+     * @param yStart    initial y (column) position for the line
+     * @param less      ammount of characters to exclude at the end of the line
+     * @return String value with retreived values
+     */
     public static String vLine(int[][] matrix, int direction, int xStart, int yStart, int less) {
         String line = null;
         if (matrix != null) {
@@ -29,6 +39,16 @@ public class UtilMatrix {
         return line;
     }
 
+    /**
+     * Returns a straight horizontal line of a matrix data
+     * 
+     * @param matrix    matrix to be traversed
+     * @param direction direction of the line (Right or left)
+     * @param xStart    initial x (row) position for the line
+     * @param yStart    initial y (column) position for the line
+     * @param less      ammount of characters to exclude at the end of the line
+     * @return String value with retreived values
+     */
     public static String hLine(int[][] matrix, int direction, int xStart, int yStart, int less) {
         String line = null;
         if (matrix != null) {
@@ -45,6 +65,17 @@ public class UtilMatrix {
         return line;
     }
 
+    /**
+     * Returns a straight diagonal line of a matrix data
+     * 
+     * @param matrix     matrix to be traversed
+     * @param vDirection direction of the line (Up or down)
+     * @param hDirection direction of the line (Right or left)
+     * @param xStart     initial x (row) position for the line
+     * @param yStart     initial y (column) position for the line
+     * @param less       ammount of characters to exclude at the end of the line
+     * @return String value with retreived values
+     */
     public static String dLine(int[][] matrix, int vDirection, int hDirection, int xStart, int yStart, int less) {
         String line = null;
         if (matrix != null) {
@@ -67,6 +98,13 @@ public class UtilMatrix {
         return line;
     }
 
+    /**
+     * Generates a new matrix with random values from 0 to 9
+     * 
+     * @param rows    number of rows for the matrix
+     * @param columns number of columns for the matrix
+     * @return generated matrix
+     */
     public static int[][] randomMatrix(int rows, int columns) {
 
         try {
@@ -84,6 +122,13 @@ public class UtilMatrix {
         }
     }
 
+    /**
+     * Generates a code by traversing a 6x6 int matrix with different shapes
+     * 
+     * @param type   path that will be taken (1 = "N" shape, 2 = "T" shape, 3 = whatever that is :c)
+     * @param matrix matrix to traverse
+     * @return Generated code
+     */
     public static String generateCode(int type, int[][] matrix) {
         String code = "";
 
