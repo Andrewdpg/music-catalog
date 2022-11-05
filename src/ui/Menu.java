@@ -47,7 +47,7 @@ public class Menu {
     }
 
     /**
-     * Returns menu's state (alive or closed)
+     * @return menu's state (alive or closed)
      */
     public boolean isAlive() {
         return this.option != 0;
