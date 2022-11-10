@@ -1,5 +1,9 @@
 package model.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Audio;
 import model.User;
 
 public abstract class Producer extends User {
@@ -8,6 +12,7 @@ public abstract class Producer extends User {
     private String imageURL;
     private int plays;
     private int playingTime;
+    private List<Audio> audios;
 
     public Producer(String nickname, String name, String imageURL) {
         super(nickname);
@@ -15,6 +20,7 @@ public abstract class Producer extends User {
         this.imageURL = imageURL;
         this.plays = 0;
         this.playingTime = 0;
+        this.audios = new ArrayList<Audio>();
     }
 
     public String getName() {
@@ -47,6 +53,13 @@ public abstract class Producer extends User {
 
     public void addPlayingTime(int time) {
         this.playingTime += time;
+    }
+
+    public List<Audio> getAudios() {
+        return audios;
+    }
+    public boolean addAudio(Audio audio){
+        return this.audios.add(audio);
     }
 
 }

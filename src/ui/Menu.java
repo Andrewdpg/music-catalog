@@ -29,7 +29,8 @@ public class Menu {
             "2. Add consumer.\n" +
             "3. Add an audio.\n" +
             "4. Create a playlist.\n" +
-            "5. Edit a playlist.\n" +
+            "5. Playlist options.\n" +
+            "6. Show playlist by ID.\n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -38,7 +39,8 @@ public class Menu {
             "3. Change name.\n" +
             "4. Change audio position.\n" +
             "5. Show playlist.\n" +
-            "6. Delete playlist.\n" +
+            "6. Share playlist.\n" +
+            "7. Delete playlist.\n" +
             "0. Done.";
 
     public Menu() {
@@ -86,7 +88,10 @@ public class Menu {
                 msg = createPlaylist();
                 break;
             case 5:
-                msg = editPlaylist();
+                msg = playlistOptions();
+                break;
+            case 6:
+                msg = showPlaylistById();
                 break;
             case 0:
                 msg = "Closing....";
@@ -98,13 +103,25 @@ public class Menu {
         System.out.println(msg);
     }
 
+    public String showPlaylistById() {
+        String msg = "Playlist not found.";
+        System.out.print("What's the playlist id? ");
+        String id = Reader.readString();
+
+        Playlist playlist = controller.getPlaylistById(id);
+        if (playlist != null) {
+            msg = "\n" + playlist.toString();
+        }
+        return msg;
+    }
+
     /**
      * Ask for an user's nickname, shows its playlists and a menu with option for
      * editing them
      * 
      * @return A message with an ending operation
      */
-    private String editPlaylist() {
+    private String playlistOptions() {
         String msg = "Non-existent user";
         String nickname = readUserNickname();
 
@@ -125,7 +142,7 @@ public class Menu {
                         input = Reader.readInt();
                         if (input != 0) {
                             Playlist selectedPlaylist = playlists.get(input - 1);
-                            System.out.println(executeEditPlaylist(selectedPlaylist, nickname));
+                            System.out.println(executePlaylistOption(selectedPlaylist, nickname));
                         }
                     } catch (Exception e) {
                         System.out.println("Invalid input");
@@ -145,7 +162,7 @@ public class Menu {
      * @param nickname         user's nickname
      * @return message with the resulting operation
      */
-    private String executeEditPlaylist(Playlist selectedPlaylist, String nickname) {
+    private String executePlaylistOption(Playlist selectedPlaylist, String nickname) {
         String msg = "";
         System.out.print("\nEditing " + selectedPlaylist.getName() + "\n" + EDITING_PLAYLIST_MENU
                 + "\nInput: ");
@@ -168,6 +185,9 @@ public class Menu {
                 msg = "\n" + selectedPlaylist.toString();
                 break;
             case 6:
+                msg = sharePlaylist(selectedPlaylist);
+                break;
+            case 7:
                 msg = deletePlaylistOf(nickname, selectedPlaylist);
             case 0:
                 break;
@@ -257,6 +277,10 @@ public class Menu {
             msg = controller.changePositions(nickname, selectedPlaylist.getId(), oldPosition - 1, newPosition - 1);
         }
         return msg;
+    }
+
+    public String sharePlaylist(Playlist selectedPlaylist) {
+        return "\nPlaylist ID: " + selectedPlaylist.getId() + "\n\nUsed matrix: \n" + selectedPlaylist.getMatrix();
     }
 
     /**

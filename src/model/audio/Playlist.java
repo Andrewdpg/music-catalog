@@ -96,7 +96,7 @@ public class Playlist {
     @Override
     public String toString() {
         String value = "Playlist name: " + name + " - ID: " + id + "\n";
-
+        value += "Total songs: " + audios.size() + ".\n\n";
         for (int i = 0; i < audios.size(); i++) {
             value += (i + 1) + ". " + audios.get(i).toString() + "\n";
         }

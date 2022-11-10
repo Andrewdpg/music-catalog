@@ -9,6 +9,7 @@ import model.audio.Song;
 import model.audio.podcast.Category;
 import model.audio.song.Genre;
 import model.user.Consumer;
+import model.user.Producer;
 import model.user.consumer.ConsumerType;
 import model.user.consumer.Premium;
 import model.user.consumer.Standard;
@@ -19,7 +20,6 @@ import model.user.producer.ProducerType;
 public class Controller {
 
     private List<User> users;
-    private List<Audio> audios;
 
     /**
      * I have to remember to delete all this, it is for testing. Sorry if i didn't
@@ -27,43 +27,61 @@ public class Controller {
      */
     public Controller() {
         this.users = new ArrayList<User>();
-        this.audios = new ArrayList<Audio>();
 
-        /* 
-         * for (int i = 0; i < 20; i++) {
-         * if (i % 2 == 0) {
-         * Audio audio = new Song("A-" + i, "asdfasdfasdf", 100, Genre.POP, "B");
-         * audios.add(audio);
-         * } else {
-         * Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 100,
-         * "SeSuponeque esto es una descripción",
-         * Category.POLITICS, "B");
-         * audios.add(audio);
-         * }
-         * }
-         * 
-         * Standard user = new Standard("a", "a");
-         * 
-         * List<Class<?>> typeList = new ArrayList<Class<?>>();
-         * typeList.add(Song.class);
-         * typeList.add(Podcast.class);
-         * 
-         * int[][] matrix = UtilMatrix.randomMatrix(6, 6);
-         * String code = UtilMatrix.generateCode(3, matrix);
-         * user.addPlaylist(new Playlist("No c", typeList, matrix, code));
-         * 
-         * user.addAudioTo(code, audios.get(0));
-         * user.addAudioTo(code, audios.get(3));
-         * user.addAudioTo(code, audios.get(1));
-         * user.addAudioTo(code, audios.get(2));
-         * user.addAudioTo(code, audios.get(7));
-         * 
-         * user.addPurchasedSong(audios.get(4).getId());
-         * user.addPurchasedSong(audios.get(12).getId());
-         * user.addPurchasedSong(audios.get(18).getId());
-         * 
-         * users.add(user);
-         */
+        addUser(new Artist("A", "A", "B"));
+        addUser(new Artist("B", "B", "B"));
+        addUser(new Artist("C", "C", "B"));
+        addUser(new Artist("D", "D", "B"));
+
+        for (int i = 0; i < 20; i++) {
+            if (i % 2 == 0) {
+                Audio audio = new Song("A-" + i, "asdfasdfasdf", 100, Genre.POP,"B");
+                ((Producer) users.get(1)).addAudio(audio);
+            } else {
+                Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 100,
+                        "SeSuponeque esto es una descripción",
+                        Category.POLITICS, "B");
+                ((Producer) users.get(2)).addAudio(audio);
+            }
+        }
+
+        Standard user = new Standard("a", "a");
+
+        List<Class<?>> typeList = new ArrayList<Class<?>>();
+        typeList.add(Song.class);
+        typeList.add(Podcast.class);
+
+        int[][] matrix = UtilMatrix.randomMatrix(6, 6);
+        String code = UtilMatrix.generateCode(3, matrix);
+        user.addPlaylist(new Playlist("No c", typeList, matrix, code));
+
+        
+        List<Audio> audios = getAllAudios();
+        user.addPurchasedSong(audios.get(0).getId());
+        user.addPurchasedSong(audios.get(3).getId());
+        user.addPurchasedSong(audios.get(1).getId());
+        user.addPurchasedSong(audios.get(2).getId());
+        user.addPurchasedSong(audios.get(7).getId());
+        user.addAudioTo(code, audios.get(0));
+        user.addAudioTo(code, audios.get(3));
+        user.addAudioTo(code, audios.get(1));
+        user.addAudioTo(code, audios.get(2));
+        user.addAudioTo(code, audios.get(7));
+
+        users.add(user);
+
+    }
+
+    public List<Audio> getAllAudios() {
+        List<Audio> out = new ArrayList<Audio>();
+
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) != null && users.get(i) instanceof Producer) {
+                out.addAll(((Producer) users.get(i)).getAudios());
+            }
+        }
+
+        return out;
     }
 
     /**
@@ -108,6 +126,7 @@ public class Controller {
      * @return Audio object in case it is found, null if it isn't
      */
     public Audio getAudio(String id) {
+        List<Audio> audios = getAllAudios();
         Audio audio = null;
         for (int i = 0; i < audios.size() && audio == null; i++) {
             if (id.equals(audios.get(i).getId())) {
@@ -177,7 +196,7 @@ public class Controller {
      * @return A message with the final result
      */
     public String registerSong(String name, int duration, String imageURL, Genre type, String nickname) {
-        return addAudio(new Song(name, imageURL, duration, type, nickname));
+        return addAudio(nickname, new Song(name, imageURL, duration, type, nickname));
     }
 
     /**
@@ -193,7 +212,7 @@ public class Controller {
      */
     public String registerPodcast(String name, int duration, String imageURL, String description, Category type,
             String nickname) {
-        return addAudio(new Podcast(name, imageURL, duration, description, type, nickname));
+        return addAudio(nickname, new Podcast(name, imageURL, duration, description, type, nickname));
     }
 
     /**
@@ -220,13 +239,20 @@ public class Controller {
      * @param audio Audio to be added
      * @return A message with the final result
      */
-    private String addAudio(Audio audio) {
+    private String addAudio(String nickname, Audio audio) {
+        List<Audio> audios = getAllAudios();
         String msg = "Looks like the exact same audio is already registered.";
         if (!audios.contains(audio)) {
-            if (audios.add(audio)) {
-                msg = "Audio successfully added.";
-            } else {
-                msg = "Failure. The audio was not added.";
+            msg = "Non-existent user";
+            int pos = getUserPosition(nickname);
+            if (pos != -1) {
+                msg = "This user is not a producer";
+                if (users.get(pos) instanceof Producer) {
+                    msg = "Failure. The audio was not added.";
+                    if (((Producer) users.get(pos)).addAudio(audio)) {
+                        msg = "Audio successfully added.";
+                    }
+                }
             }
         }
         return msg;
@@ -319,6 +345,7 @@ public class Controller {
      */
     public List<Audio> audiosForUser(String nickname, List<Class<?>> audioTypes, String notIn) {
         int userPos = getUserPosition(nickname);
+        List<Audio> audios = getAllAudios();
         List<Audio> availableAudios = null;
         if (userPos != -1 && users.get(userPos) instanceof Consumer) {
             availableAudios = new ArrayList<Audio>();
@@ -349,6 +376,7 @@ public class Controller {
      */
     public List<Audio> audiosForUser(String nickname, List<Class<?>> audioTypes) {
         int userPos = getUserPosition(nickname);
+        List<Audio> audios = getAllAudios();
         List<Audio> availableAudios = null;
         if (userPos != -1 && users.get(userPos) instanceof Consumer) {
             availableAudios = new ArrayList<Audio>();
@@ -480,6 +508,16 @@ public class Controller {
             }
         }
         return msg;
+    }
+
+    public Playlist getPlaylistById(String id) {
+        Playlist playlist = null;
+        for (int i = 0; i < users.size() && playlist == null; i++) {
+            if(users.get(i) instanceof Consumer){
+                playlist = ((Consumer)users.get(i)).getPlaylist(id);
+            }
+        }
+        return playlist;
     }
 
 }

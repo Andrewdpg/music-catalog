@@ -144,6 +144,7 @@ public abstract class Consumer extends User {
         } else {
             msg = addAudioToPlaylist(playlistId, audio);
         }
+        System.out.println(msg);
         return msg;
     }
 
