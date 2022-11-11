@@ -1,14 +1,16 @@
 package model;
 
+import model.audio.IPlayable;
 import model.audio.Podcast;
 import model.audio.Song;
 
-public abstract class Audio {
+public abstract class Audio implements IPlayable{
 
     private String name;
     private String imageURL;
     private String owner;
     private String id;
+    private int played;
     private int duration;
 
     public static final Class<?>[] children = { Song.class, Podcast.class };
@@ -59,7 +61,26 @@ public abstract class Audio {
 
     @Override
     public String toString() {
-        String value = name +  " - by: " + owner;
+        String value = name + " - by: " + owner;
         return value;
+    }
+
+    @Override
+    public void play() {
+        int seconds = 0;
+        int minutes = 0;
+        while (played < getDuration()) {
+            try {
+                minutes = played / 60000;
+                seconds = (played / 1000) - minutes * 60;
+                System.out.print("Playing: " + getName() + " - " + minutes + ":"
+                        + (String.valueOf(seconds).length() < 2 ? "0" + seconds : seconds) + "\r");
+                Thread.sleep(1000);
+                played += getDuration() - played < 1000 ? getDuration() - played : 1000;
+            } catch (Exception e) {
+
+            }
+        }
+        played = 0;
     }
 }

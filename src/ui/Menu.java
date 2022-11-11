@@ -10,6 +10,7 @@ import model.User;
 import model.audio.Playlist;
 import model.audio.podcast.Category;
 import model.audio.song.Genre;
+import model.user.Consumer;
 import model.user.Producer;
 import model.user.consumer.ConsumerType;
 import model.user.producer.Artist;
@@ -30,7 +31,8 @@ public class Menu {
             "3. Add an audio.\n" +
             "4. Create a playlist.\n" +
             "5. Playlist options.\n" +
-            "6. Show playlist by ID.\n" +
+            "6. Search playlist by ID.\n" +
+            "7. Play an audio.\n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -91,7 +93,10 @@ public class Menu {
                 msg = playlistOptions();
                 break;
             case 6:
-                msg = showPlaylistById();
+                msg = searchPlaylistById();
+                break;
+            case 7:
+                playAudios();
                 break;
             case 0:
                 msg = "Closing....";
@@ -103,7 +108,36 @@ public class Menu {
         System.out.println(msg);
     }
 
-    public String showPlaylistById() {
+    public void playAudios() {
+        String nickname = readUserNickname();
+
+        User user = controller.getUser(nickname);
+        if (user != null && user instanceof Consumer) {
+            try {
+                List<Audio> availableAudios = controller.audiosForUser(nickname);
+                String audioList = "\nList of available audios: \n";
+                for (int i = 1; i <= availableAudios.size(); i++) {
+                    audioList += i + ". " + availableAudios.get(i - 1).getName() + "\n";
+                }
+                audioList += "0. Cancel";
+                System.out.print(audioList + "\nInput: ");
+                int input = Reader.readInt();
+                if (input != 0) {
+                    String ad = controller.increaseAdPercentageTo(nickname, availableAudios.get(input - 1).getId());
+                    if (ad != null) {
+                        System.out.println(ad+"\n");
+                    }
+                    availableAudios.get(input - 1).play();
+                }
+
+            } catch (Exception e) {
+                System.out.println("Invalid input");
+            }
+        }
+
+    }
+
+    public String searchPlaylistById() {
         String msg = "Playlist not found.";
         System.out.print("What's the playlist id? ");
         String id = Reader.readString();

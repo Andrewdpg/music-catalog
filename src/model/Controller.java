@@ -35,10 +35,10 @@ public class Controller {
 
         for (int i = 0; i < 20; i++) {
             if (i % 2 == 0) {
-                Audio audio = new Song("A-" + i, "asdfasdfasdf", 100, Genre.POP,"B");
+                Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, "B");
                 ((Producer) users.get(1)).addAudio(audio);
             } else {
-                Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 100,
+                Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.POLITICS, "B");
                 ((Producer) users.get(2)).addAudio(audio);
@@ -46,6 +46,7 @@ public class Controller {
         }
 
         Standard user = new Standard("a", "a");
+        Premium user1 = new Premium("p", "p");
 
         List<Class<?>> typeList = new ArrayList<Class<?>>();
         typeList.add(Song.class);
@@ -55,7 +56,6 @@ public class Controller {
         String code = UtilMatrix.generateCode(3, matrix);
         user.addPlaylist(new Playlist("No c", typeList, matrix, code));
 
-        
         List<Audio> audios = getAllAudios();
         user.addPurchasedSong(audios.get(0).getId());
         user.addPurchasedSong(audios.get(3).getId());
@@ -67,8 +67,20 @@ public class Controller {
         user.addAudioTo(code, audios.get(1));
         user.addAudioTo(code, audios.get(2));
         user.addAudioTo(code, audios.get(7));
+        
+        user1.addPurchasedSong(audios.get(0).getId());
+        user1.addPurchasedSong(audios.get(3).getId());
+        user1.addPurchasedSong(audios.get(1).getId());
+        user1.addPurchasedSong(audios.get(2).getId());
+        user1.addPurchasedSong(audios.get(7).getId());
+        user1.addAudioTo(code, audios.get(0));
+        user1.addAudioTo(code, audios.get(3));
+        user1.addAudioTo(code, audios.get(1));
+        user1.addAudioTo(code, audios.get(2));
+        user1.addAudioTo(code, audios.get(7));
 
         users.add(user);
+        users.add(user1);
 
     }
 
@@ -398,6 +410,34 @@ public class Controller {
     }
 
     /**
+     * Returns a list of available audios for a certain user.
+     * 
+     * @param nickname   User's nickname
+     * @param audioTypes Audio types to be retreived
+     * @return List of available audios for the selected user.
+     */
+    public List<Audio> audiosForUser(String nickname) {
+        int userPos = getUserPosition(nickname);
+        List<Audio> audios = getAllAudios();
+        List<Audio> availableAudios = null;
+        if (userPos != -1 && users.get(userPos) instanceof Consumer) {
+            availableAudios = new ArrayList<Audio>();
+            Consumer user = (Consumer) users.get(userPos);
+            for (int i = 0; i < audios.size(); i++) {
+                Audio currentAudio = audios.get(i);
+                if (currentAudio instanceof Song) {
+                    if (user.boughtSong(currentAudio.getId())) {
+                        availableAudios.add(currentAudio);
+                    }
+                } else {
+                    availableAudios.add(currentAudio);
+                }
+            }
+        }
+        return availableAudios;
+    }
+
+    /**
      * Adds an existent audio to an user's existent playlist
      * 
      * @param nickname   user's nickname
@@ -513,11 +553,25 @@ public class Controller {
     public Playlist getPlaylistById(String id) {
         Playlist playlist = null;
         for (int i = 0; i < users.size() && playlist == null; i++) {
-            if(users.get(i) instanceof Consumer){
-                playlist = ((Consumer)users.get(i)).getPlaylist(id);
+            if (users.get(i) instanceof Consumer) {
+                playlist = ((Consumer) users.get(i)).getPlaylist(id);
             }
         }
         return playlist;
+    }
+
+    public String increaseAdPercentageTo(String nickname, String audioID) {
+        String msg = null;
+        int pos = getUserPosition(nickname);
+        if (pos != -1) {
+            if (users.get(pos) instanceof Standard) {
+                Audio audio = getAudio(audioID);
+                if (audio != null) {
+                    msg = ((Standard) users.get(pos)).increaseAdPercentage(audio instanceof Podcast ? 1 : 0.4);
+                }
+            }
+        }
+        return msg;
     }
 
 }
