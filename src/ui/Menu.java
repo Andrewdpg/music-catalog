@@ -36,6 +36,7 @@ public class Menu {
             "7. Play an audio.\n" +
             "8. Buy a song.\n" +
             "9. Total reproductions by audio type. \n" +
+            "10. Most reproduced by classification. \n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -107,6 +108,9 @@ public class Menu {
             case 9:
                 msg = controller.getTotalReproductionsByType();
                 break;
+            case 10:
+                msg = mostPlayedByClassification();
+                break;
             case 0:
                 msg = "Closing....";
                 break;
@@ -115,6 +119,36 @@ public class Menu {
                 break;
         }
         System.out.println(msg);
+    }
+
+    public String mostPlayedByClassification() {
+        String msg = null;
+        System.out.print("\n1. An specific user.\n2. The entire platform.\nInput: ");
+        int input = Reader.readInt();
+        try {
+            switch (input) {
+                case 1:
+                    String nickname = readUserNickname();
+                    msg = controller.getMostPlayedClassificationOf(nickname);
+                    break;
+                case 2:
+                    Class<?>[] classifications = controller.getAudioClassification();
+                    String classesMenu = "\nWhich classification are you looking for? \n";
+                    for (int i = 1; i <= classifications.length; i++) {
+                        classesMenu += i + ". " + classifications[i - 1].getSimpleName() + "\n";
+                    }
+                    System.out.print(classesMenu + "Input: ");
+                    input = Reader.readInt();
+                    msg = controller.getMostPlayedByClassification(classifications[input - 1]);
+                    break;
+                default:
+                    msg = "Invalid option";
+                    break;
+            }
+        } catch (Exception e) {
+            msg = "Invalid input";
+        }
+        return msg;
     }
 
     public String buyASong() {

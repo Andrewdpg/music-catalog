@@ -55,15 +55,28 @@ public abstract class Producer extends User {
     }
 
     public Map<String, Integer> audioTypeStadistics() {
-        Map<String, Integer> classification = new HashMap<String, Integer>();
+        Map<String, Integer> stadistics = new HashMap<String, Integer>();
         int currentCount = 0;
         String currentClass = "";
         for (int i = 0; i < audios.size(); i++) {
             currentClass = audios.get(i).getClass().getSimpleName();
-            currentCount = classification.get(currentClass) != null ? classification.get(currentClass) : 0;
-            classification.put(currentClass, currentCount + audios.get(i).getTimesReproduced());
+            currentCount = stadistics.get(currentClass) != null ? stadistics.get(currentClass) : 0;
+            stadistics.put(currentClass, currentCount + audios.get(i).getTimesReproduced());
         }
-        return classification;
+        return stadistics;
     }
 
+    public Map<String,Integer> classificationStadistics(Class<?> type){
+        Map<String, Integer> stadistics = new HashMap<String, Integer>();
+        int currentCount = 0;
+        String currentClass = "";
+        for (int i = 0; i < audios.size(); i++) {
+            if(audios.get(i).getClassication().getClass() == type){
+                currentClass = audios.get(i).getClassication().name();
+                currentCount = stadistics.get(currentClass) != null ? stadistics.get(currentClass) : 0;
+                stadistics.put(currentClass, currentCount + audios.get(i).getTimesReproduced());
+            }
+        }
+        return stadistics;
+    }
 }

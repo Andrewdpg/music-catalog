@@ -20,4 +20,9 @@ public final class Song extends Audio {
         this.genre = genre;
     }
 
+    @Override
+    public Enum<?> getClassication() {
+        return this.genre;
+    }
+
 }

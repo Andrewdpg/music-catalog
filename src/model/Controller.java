@@ -38,12 +38,24 @@ public class Controller {
         for (int i = 0; i < 20; i++) {
             if (i % 2 == 0) {
                 Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, "B");
+                Audio audio2 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.ROCK, "B");
+                Audio audio3 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.HOUSE, "B");
                 ((Producer) users.get(1)).addAudio(audio);
+                ((Producer) users.get(1)).addAudio(audio2);
+                ((Producer) users.get(1)).addAudio(audio3);
             } else {
                 Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
+                        Category.ENTERTAIMENT, "B");
+                Audio audio2 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
+                        "SeSuponeque esto es una descripción",
                         Category.POLITICS, "B");
-                ((Producer) users.get(2)).addAudio(audio);
+                Audio audio3 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
+                        "SeSuponeque esto es una descripción",
+                        Category.FASHION, "B");
+                ((Producer) users.get(1)).addAudio(audio);
+                ((Producer) users.get(1)).addAudio(audio2);
+                ((Producer) users.get(2)).addAudio(audio3);
             }
         }
 
@@ -355,6 +367,10 @@ public class Controller {
         return Audio.children;
     }
 
+    public Class<?>[] getAudioClassification() {
+        return Audio.classifications;
+    }
+
     /**
      * Returns a list of available audios for a certain user.
      * 
@@ -642,6 +658,59 @@ public class Controller {
         }
         for (String key : dir.keySet()) {
             msg += "- " + key.toUpperCase() + ": " + dir.get(key) + "\n";
+        }
+        return msg;
+    }
+
+    public String getMostPlayedByClassification(Class<?> type) {
+        String msg = "";
+        Map<String, Integer> dir = new HashMap<String, Integer>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Producer) {
+                ((Producer) users.get(i)).classificationStadistics(type)
+                        .forEach((key, value) -> dir.put(key, dir.get(key) != null ? dir.get(key) + value : value));
+            }
+        }
+        int greater = 0;
+        for (String key : dir.keySet()) {
+            if (dir.get(key) > greater) {
+                greater = dir.get(key);
+                msg = key.toUpperCase() + ": " + greater;
+            } else if (dir.get(key) == greater) {
+                msg += "\n" + key.toUpperCase() + ": " + greater;
+            }
+        }
+        return msg;
+    }
+
+    public String getMostPlayedClassificationOf(String nickname) {
+        String msg = "Non-existent user";
+        int pos = getUserPosition(nickname);
+        if (pos != -1) {
+            msg = "This user is not a producer";
+            if (users.get(pos) instanceof Producer) {
+                msg = "";
+                for (Class<?> type : getAudioClassification()) {
+                    Map<String, Integer> dir = new HashMap<String, Integer>();
+                    ((Producer) users.get(pos)).classificationStadistics(type)
+                            .forEach((key, value) -> dir.put(key, dir.get(key) != null ? dir.get(key) + value : value));
+                    int greater = 0;
+
+                    if (!dir.isEmpty()) {
+                        msg += type.getSimpleName() + " most played classifications:\n";
+                        for (String key : dir.keySet()) {
+                            if (dir.get(key) > greater) {
+                                greater = dir.get(key);
+                                msg = key.toUpperCase() + ": " + greater;
+                            } else if (dir.get(key) == greater) {
+                                msg += "\n" + key.toUpperCase() + ": " + greater;
+                            }
+                        }
+                        msg += "\n\n";
+                    }
+                }
+                msg = msg.substring(0, msg.length() - 3);
+            }
         }
         return msg;
     }

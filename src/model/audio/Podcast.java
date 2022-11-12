@@ -30,4 +30,9 @@ public final class Podcast extends Audio {
         this.category = category;
     }
 
+    @Override
+    public Enum<?> getClassication() {
+        return this.category;
+    }
+
 }

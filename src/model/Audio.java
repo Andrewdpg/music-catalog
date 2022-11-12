@@ -3,8 +3,10 @@ package model;
 import model.audio.IPlayable;
 import model.audio.Podcast;
 import model.audio.Song;
+import model.audio.podcast.Category;
+import model.audio.song.Genre;
 
-public abstract class Audio implements IPlayable{
+public abstract class Audio implements IPlayable {
 
     private String name;
     private String imageURL;
@@ -14,6 +16,7 @@ public abstract class Audio implements IPlayable{
     private int duration;
 
     public static final Class<?>[] children = { Song.class, Podcast.class };
+    public static final Class<?>[] classifications = { Genre.class, Category.class };
 
     public Audio(String name, String imageURL, String owner, int duration) {
         this.name = name;
@@ -60,11 +63,11 @@ public abstract class Audio implements IPlayable{
         return this.id;
     }
 
-    public int getTimesReproduced(){
+    public int getTimesReproduced() {
         return this.timesReproduced;
     }
 
-    public void increaseReproductions(){
+    public void increaseReproductions() {
         this.timesReproduced++;
     }
 
@@ -79,7 +82,7 @@ public abstract class Audio implements IPlayable{
         int played = 0;
         int seconds = 0;
         int minutes = 0;
-        while (played < getDuration()) {
+        while (played < getDuration() || played < 5000) {
             try {
                 minutes = played / 60000;
                 seconds = (played / 1000) - minutes * 60;
@@ -88,8 +91,9 @@ public abstract class Audio implements IPlayable{
                 Thread.sleep(1000);
                 played += getDuration() - played < 1000 ? getDuration() - played : 1000;
             } catch (Exception e) {
-
             }
         }
     }
+
+    public abstract Enum<?> getClassication();
 }
