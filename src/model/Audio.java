@@ -10,7 +10,7 @@ public abstract class Audio implements IPlayable{
     private String imageURL;
     private String owner;
     private String id;
-    private int played;
+    private int timesReproduced;
     private int duration;
 
     public static final Class<?>[] children = { Song.class, Podcast.class };
@@ -20,6 +20,7 @@ public abstract class Audio implements IPlayable{
         this.imageURL = imageURL;
         this.owner = owner;
         this.duration = duration;
+        this.timesReproduced = 0;
         this.id = UtilMatrix.generateCode(1, UtilMatrix.randomMatrix(6, 6));
     }
 
@@ -59,6 +60,14 @@ public abstract class Audio implements IPlayable{
         return this.id;
     }
 
+    public int getTimesReproduced(){
+        return this.timesReproduced;
+    }
+
+    public void increaseReproductions(){
+        this.timesReproduced++;
+    }
+
     @Override
     public String toString() {
         String value = name + " - by: " + owner;
@@ -67,6 +76,7 @@ public abstract class Audio implements IPlayable{
 
     @Override
     public void play() {
+        int played = 0;
         int seconds = 0;
         int minutes = 0;
         while (played < getDuration()) {
@@ -81,6 +91,5 @@ public abstract class Audio implements IPlayable{
 
             }
         }
-        played = 0;
     }
 }

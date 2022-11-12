@@ -8,6 +8,7 @@ import model.Audio;
 import model.Controller;
 import model.User;
 import model.audio.Playlist;
+import model.audio.Song;
 import model.audio.podcast.Category;
 import model.audio.song.Genre;
 import model.user.Consumer;
@@ -33,6 +34,8 @@ public class Menu {
             "5. Playlist options.\n" +
             "6. Search playlist by ID.\n" +
             "7. Play an audio.\n" +
+            "8. Buy a song.\n" +
+            "9. Total reproductions by audio type. \n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -98,6 +101,12 @@ public class Menu {
             case 7:
                 playAudios();
                 break;
+            case 8:
+                msg = buyASong();
+                break;
+            case 9:
+                msg = controller.getTotalReproductionsByType();
+                break;
             case 0:
                 msg = "Closing....";
                 break;
@@ -108,6 +117,31 @@ public class Menu {
         System.out.println(msg);
     }
 
+    public String buyASong() {
+        User user = controller.getUser(readUserNickname());
+
+        String msg = "This user doesn't exist";
+        if (user != null) {
+            msg = "This user is not a consumer";
+            if (user instanceof Consumer) {
+                List<Song> availableSongs = controller.getAvailableSongsForPurchase(user.getNickname());
+                msg = "There are not new songs available for purchase";
+                if (availableSongs != null) {
+                    System.out.print("\n" + listToString(availableSongs) + "\n0. Cancel\n\nInput: ");
+                    int input = Reader.readInt();
+                    msg = "";
+                    if (input >= 1 && input <= availableSongs.size()) {
+                        msg = controller.buySongFor(user.getNickname(), availableSongs.get(input - 1).getId());
+                    } else {
+                        msg = "invalid input";
+                    }
+                }
+            }
+        }
+
+        return msg;
+    }
+
     public void playAudios() {
         String nickname = readUserNickname();
 
@@ -115,24 +149,23 @@ public class Menu {
         if (user != null && user instanceof Consumer) {
             try {
                 List<Audio> availableAudios = controller.audiosForUser(nickname);
-                String audioList = "\nList of available audios: \n";
-                for (int i = 1; i <= availableAudios.size(); i++) {
-                    audioList += i + ". " + availableAudios.get(i - 1).getName() + "\n";
-                }
-                audioList += "0. Cancel";
-                System.out.print(audioList + "\nInput: ");
+                System.out.print(
+                        "\nList of available audios: \n" + listToString(availableAudios) + "\n0. Cancel\n\nInput: ");
                 int input = Reader.readInt();
                 if (input != 0) {
                     String ad = controller.increaseAdPercentageTo(nickname, availableAudios.get(input - 1).getId());
                     if (ad != null) {
-                        System.out.println(ad+"\n");
+                        System.out.println(ad + "\n");
                     }
+                    controller.userPlayed(nickname, availableAudios.get(input - 1).getId());
                     availableAudios.get(input - 1).play();
                 }
 
             } catch (Exception e) {
                 System.out.println("Invalid input");
             }
+        } else {
+            System.out.println("Looks like the user doesn't exist or it is no a consumer.\n");
         }
 
     }
@@ -245,12 +278,7 @@ public class Menu {
         List<Audio> availableAudios = controller.audiosForUser(nickname,
                 selectedPlaylist.getAudioTypes(),
                 selectedPlaylist.getId());
-        String audioList = "\nList of available audios: \n";
-        for (int i = 1; i <= availableAudios.size(); i++) {
-            audioList += i + ". " + availableAudios.get(i - 1).getName() + "\n";
-        }
-        audioList += "0. Cancel";
-        System.out.print(audioList + "\nInput: ");
+        System.out.print("\nList of available audios: \n" + listToString(availableAudios) + "\n0. Cancel\n\nInput: ");
         int input = Reader.readInt();
         if (input != 0) {
             msg = controller.addAudioToUserPlaylist(nickname, selectedPlaylist.getId(),
@@ -497,5 +525,18 @@ public class Menu {
             result = "Value not supported";
         }
         return result;
+    }
+
+    public String listToString(List<?> list) {
+        String out = null;
+        if (list != null) {
+            if (!list.isEmpty()) {
+                out = "";
+                for (int i = 0; i < list.size(); i++) {
+                    out += (i + 1) + ". " + list.get(i).toString() + "\n";
+                }
+            }
+        }
+        return out;
     }
 }

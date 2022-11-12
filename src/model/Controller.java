@@ -1,7 +1,9 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.audio.Playlist;
 import model.audio.Podcast;
@@ -67,7 +69,7 @@ public class Controller {
         user.addAudioTo(code, audios.get(1));
         user.addAudioTo(code, audios.get(2));
         user.addAudioTo(code, audios.get(7));
-        
+
         user1.addPurchasedSong(audios.get(0).getId());
         user1.addPurchasedSong(audios.get(3).getId());
         user1.addPurchasedSong(audios.get(1).getId());
@@ -94,6 +96,12 @@ public class Controller {
         }
 
         return out;
+    }
+
+    public List<Audio> getAudiosOfType(Class<?> classType) {
+        List<Audio> list = getAllAudios();
+        list.removeIf(audio -> (audio.getClass() != classType));
+        return list;
     }
 
     /**
@@ -570,6 +578,70 @@ public class Controller {
                     msg = ((Standard) users.get(pos)).increaseAdPercentage(audio instanceof Podcast ? 1 : 0.4);
                 }
             }
+        }
+        return msg;
+    }
+
+    public List<Song> getAvailableSongsForPurchase(String nickname) {
+        List<Audio> songs = getAudiosOfType(Song.class);
+        List<Song> availableSongs = new ArrayList<Song>();
+        User user = getUser(nickname);
+
+        if (user != null && user instanceof Consumer) {
+            for (Audio song : songs) {
+                if (!((Consumer) user).boughtSong(song.getId())) {
+                    availableSongs.add((Song) song);
+                }
+            }
+        }
+
+        return availableSongs;
+    }
+
+    public String buySongFor(String nickname, String songID) {
+        int pos = getUserPosition(nickname);
+
+        String msg = "Non-existent user";
+        if (pos != -1) {
+            msg = "This user is not a consumer";
+            if (users.get(pos) instanceof Consumer) {
+                msg = "The audio doesn't exist";
+                if (getAudio(songID) != null) {
+                    if (((Consumer) users.get(pos)).canPurchaseASong()) {
+                        ((Consumer) users.get(pos)).addPurchasedSong(songID);
+                        msg = "Song successfully bought";
+                    }
+                }
+            }
+        }
+
+        return msg;
+    }
+
+    public void userPlayed(String nickname, String audioID) {
+        Audio playedAudio = getAudio(audioID);
+        if (playedAudio != null) {
+            int posOwner = getUserPosition(playedAudio.getOwner());
+            if (posOwner != -1) {
+                if (users.get(posOwner) instanceof Producer) {
+                    ((Producer) users.get(posOwner)).playedAudio(audioID);
+                }
+            }
+        }
+    }
+
+    public String getTotalReproductionsByType() {
+        String msg = "";
+        Map<String, Integer> dir = new HashMap<String, Integer>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Producer) {
+                ((Producer) users.get(i)).audioTypeStadistics().forEach((key, value) -> {
+                    dir.put(key, dir.get(key) != null ? dir.get(key) + value : value);
+                });
+            }
+        }
+        for (String key : dir.keySet()) {
+            msg += "- " + key.toUpperCase() + ": " + dir.get(key) + "\n";
         }
         return msg;
     }
