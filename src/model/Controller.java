@@ -43,8 +43,8 @@ public class Controller {
         for (int i = 0; i < 20; i++) {
             if (i % 2 == 0) {
                 Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, getUsers().get(1).getNickname());
-                Audio audio2 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.ROCK, getUsers().get(2).getNickname());
-                Audio audio3 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.HOUSE, getUsers().get(0).getNickname());
+                Audio audio2 = new Song("S-" + (i+20), "asdfasdfasdf", 10000, Genre.ROCK, getUsers().get(2).getNickname());
+                Audio audio3 = new Song("S-" + (i+40), "asdfasdfasdf", 10000, Genre.HOUSE, getUsers().get(0).getNickname());
                 ((Producer) getUsers().get(1)).addAudio(audio);
                 ((Producer) getUsers().get(2)).addAudio(audio2);
                 ((Producer) getUsers().get(0)).addAudio(audio3);
@@ -52,10 +52,10 @@ public class Controller {
                 Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.ENTERTAIMENT, getUsers().get(0).getNickname());
-                Audio audio2 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
+                Audio audio2 = new Podcast("P-" + (i+20), "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.POLITICS, getUsers().get(3).getNickname());
-                Audio audio3 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
+                Audio audio3 = new Podcast("P-" + (i+40), "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.FASHION, getUsers().get(5).getNickname());
                 ((Producer) getUsers().get(0)).addAudio(audio);
@@ -103,7 +103,7 @@ public class Controller {
 
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return this.users;
     }
 
@@ -749,6 +749,39 @@ public class Controller {
             msg += "\nTop content creators:\n\n";
             for (int i = 0; i < creators.size() && i < 5; i++) {
                 msg += (i + 1) + ". " + ((Producer) creators.get(i)).toString() + "\n";
+            }
+            msg += "\n";
+        }
+
+        return msg;
+    }
+
+    public String audiosRanking() {
+        String msg = "";
+
+        List<Audio> ranking = new ArrayList<Audio>(getAllAudios());
+        Collections.sort(ranking);
+
+        List<Audio> podcasts = new ArrayList<Audio>(ranking);
+        List<Audio> songs = new ArrayList<Audio>(ranking);
+
+        podcasts.removeIf(audio -> !(audio instanceof Podcast));
+        songs.removeIf(audio -> !(audio instanceof Song));
+
+        if (!podcasts.isEmpty()) {
+            msg += "\nTop podcasts:\n\n";
+            for (int i = 0; i < podcasts.size() && i < 10; i++) {
+                msg += (i + 1) + ". " + podcasts.get(i).toString() + " Total reproductions: "
+                        + podcasts.get(i).getTimesReproduced() + "\n";
+            }
+            msg += "\n";
+        }
+
+        if (!songs.isEmpty()) {
+            msg += "\nTop songs:\n\n";
+            for (int i = 0; i < songs.size() && i < 10; i++) {
+                msg += (i + 1) + ". " + songs.get(i).toString() + " Total reproductions: "
+                        + songs.get(i).getTimesReproduced() + "\n";
             }
             msg += "\n";
         }

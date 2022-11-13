@@ -6,7 +6,7 @@ import model.audio.Song;
 import model.audio.podcast.Category;
 import model.audio.song.Genre;
 
-public abstract class Audio implements IPlayable {
+public abstract class Audio implements IPlayable, Comparable<Audio> {
 
     private String name;
     private String imageURL;
@@ -64,17 +64,16 @@ public abstract class Audio implements IPlayable {
     }
 
     public int getTimesReproduced() {
-        return this.timesReproduced;
+        return timesReproduced;
     }
 
     public void increaseReproductions() {
-        this.timesReproduced++;
+        timesReproduced++;
     }
 
     @Override
     public String toString() {
-        String value = name + " - by: " + owner;
-        return value;
+        return name + " - by: " + owner;
     }
 
     @Override
@@ -96,4 +95,19 @@ public abstract class Audio implements IPlayable {
     }
 
     public abstract Enum<?> getClassication();
+
+    @Override
+    public int compareTo(Audio o) {
+        int result = 0;
+        if(getTimesReproduced() > o.getTimesReproduced()){
+            result = -1;
+        }else if(getTimesReproduced() == o.getTimesReproduced()){
+            result = 0;
+        }else{
+            result = 1;
+        }
+        return result;
+    }
+
+    
 }

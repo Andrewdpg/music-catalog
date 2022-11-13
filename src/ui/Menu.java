@@ -38,6 +38,7 @@ public class Menu {
             "9. Total reproductions by audio type. \n" +
             "10. Most reproduced by classification. \n" +
             "11. Producers ranking. \n" +
+            "12. Audios ranking. \n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -116,7 +117,7 @@ public class Menu {
                 msg = controller.producersRanking();
                 break;
             case 12:
-                msg = mostPlayedByClassification();
+                msg = controller.audiosRanking();
                 break;
             case 0:
                 msg = "Closing....";
