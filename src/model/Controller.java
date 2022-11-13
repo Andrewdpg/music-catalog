@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,28 +35,32 @@ public class Controller {
         addUser(new Artist("B", "B", "B"));
         addUser(new Artist("C", "C", "B"));
         addUser(new Artist("D", "D", "B"));
+        addUser(new Artist("E", "E", "B"));
+        addUser(new Artist("F", "F", "B"));
+        addUser(new Artist("G", "G", "B"));
+        addUser(new Artist("H", "H", "B"));
 
         for (int i = 0; i < 20; i++) {
             if (i % 2 == 0) {
-                Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, "B");
-                Audio audio2 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.ROCK, "B");
-                Audio audio3 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.HOUSE, "B");
-                ((Producer) users.get(1)).addAudio(audio);
-                ((Producer) users.get(1)).addAudio(audio2);
-                ((Producer) users.get(1)).addAudio(audio3);
+                Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, getUsers().get(1).getNickname());
+                Audio audio2 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.ROCK, getUsers().get(2).getNickname());
+                Audio audio3 = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.HOUSE, getUsers().get(0).getNickname());
+                ((Producer) getUsers().get(1)).addAudio(audio);
+                ((Producer) getUsers().get(2)).addAudio(audio2);
+                ((Producer) getUsers().get(0)).addAudio(audio3);
             } else {
                 Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
-                        Category.ENTERTAIMENT, "B");
+                        Category.ENTERTAIMENT, getUsers().get(0).getNickname());
                 Audio audio2 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
-                        Category.POLITICS, "B");
+                        Category.POLITICS, getUsers().get(3).getNickname());
                 Audio audio3 = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
-                        Category.FASHION, "B");
-                ((Producer) users.get(1)).addAudio(audio);
-                ((Producer) users.get(1)).addAudio(audio2);
-                ((Producer) users.get(2)).addAudio(audio3);
+                        Category.FASHION, getUsers().get(5).getNickname());
+                ((Producer) getUsers().get(0)).addAudio(audio);
+                ((Producer) getUsers().get(3)).addAudio(audio2);
+                ((Producer) getUsers().get(5)).addAudio(audio3);
             }
         }
 
@@ -93,17 +98,21 @@ public class Controller {
         user1.addAudioTo(code, audios.get(2));
         user1.addAudioTo(code, audios.get(7));
 
-        users.add(user);
-        users.add(user1);
+        getUsers().add(user);
+        getUsers().add(user1);
 
+    }
+
+    public List<User> getUsers(){
+        return this.users;
     }
 
     public List<Audio> getAllAudios() {
         List<Audio> out = new ArrayList<Audio>();
 
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i) != null && users.get(i) instanceof Producer) {
-                out.addAll(((Producer) users.get(i)).getAudios());
+        for (int i = 0; i < getUsers().size(); i++) {
+            if (getUsers().get(i) != null && getUsers().get(i) instanceof Producer) {
+                out.addAll(((Producer) getUsers().get(i)).getAudios());
             }
         }
 
@@ -126,16 +135,16 @@ public class Controller {
         int position = -1;
         User user = getUser(nickname);
         if (user != null) {
-            position = users.indexOf(user);
+            position = getUsers().indexOf(user);
         }
         return position;
     }
 
     public User getUser(String nickname) {
         User user = null;
-        for (int i = 0; i < users.size() && user == null; i++) {
-            if (nickname.equals(users.get(i).getNickname())) {
-                user = users.get(i);
+        for (int i = 0; i < getUsers().size() && user == null; i++) {
+            if (nickname.equals(getUsers().get(i).getNickname())) {
+                user = getUsers().get(i);
             }
         }
         return user;
@@ -256,7 +265,7 @@ public class Controller {
     private String addUser(User user) {
         String msg = "Nickname already exist.";
         if (!userExist(user.getNickname())) {
-            if (users.add(user)) {
+            if (getUsers().add(user)) {
                 msg = "User successfully added.";
             } else {
                 msg = "Failure. The user was not added.";
@@ -279,9 +288,9 @@ public class Controller {
             int pos = getUserPosition(nickname);
             if (pos != -1) {
                 msg = "This user is not a producer";
-                if (users.get(pos) instanceof Producer) {
+                if (getUsers().get(pos) instanceof Producer) {
                     msg = "Failure. The audio was not added.";
-                    if (((Producer) users.get(pos)).addAudio(audio)) {
+                    if (((Producer) getUsers().get(pos)).addAudio(audio)) {
                         msg = "Audio successfully added.";
                     }
                 }
@@ -303,7 +312,7 @@ public class Controller {
         int userPos = getUserPosition(userNickname);
         if (userPos != -1) {
             msg = "This user is not a consumer.";
-            if (users.get(userPos) instanceof Consumer) {
+            if (getUsers().get(userPos) instanceof Consumer) {
                 msg = "The playlist could not be added.";
                 int type = 0;
                 for (Class<?> classType : audioTypes) {
@@ -317,7 +326,7 @@ public class Controller {
                 int[][] matrix = UtilMatrix.randomMatrix(6, 6);
                 Playlist newPlaylist = new Playlist(name, audioTypes, matrix,
                         UtilMatrix.generateCode(type, matrix));
-                if (((Consumer) users.get(userPos))
+                if (((Consumer) getUsers().get(userPos))
                         .addPlaylist(newPlaylist)) {
                     msg = "Playlist successfully created";
                 }
@@ -383,9 +392,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         List<Audio> audios = getAllAudios();
         List<Audio> availableAudios = null;
-        if (userPos != -1 && users.get(userPos) instanceof Consumer) {
+        if (userPos != -1 && getUsers().get(userPos) instanceof Consumer) {
             availableAudios = new ArrayList<Audio>();
-            Consumer user = (Consumer) users.get(userPos);
+            Consumer user = (Consumer) getUsers().get(userPos);
             List<Audio> excludedAudios = user.getPlaylist(notIn).getAudios();
             for (int i = 0; i < audios.size(); i++) {
                 Audio currentAudio = audios.get(i);
@@ -414,9 +423,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         List<Audio> audios = getAllAudios();
         List<Audio> availableAudios = null;
-        if (userPos != -1 && users.get(userPos) instanceof Consumer) {
+        if (userPos != -1 && getUsers().get(userPos) instanceof Consumer) {
             availableAudios = new ArrayList<Audio>();
-            Consumer user = (Consumer) users.get(userPos);
+            Consumer user = (Consumer) getUsers().get(userPos);
             for (int i = 0; i < audios.size(); i++) {
                 Audio currentAudio = audios.get(i);
                 if (audioTypes.contains(currentAudio.getClass())) {
@@ -444,9 +453,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         List<Audio> audios = getAllAudios();
         List<Audio> availableAudios = null;
-        if (userPos != -1 && users.get(userPos) instanceof Consumer) {
+        if (userPos != -1 && getUsers().get(userPos) instanceof Consumer) {
             availableAudios = new ArrayList<Audio>();
-            Consumer user = (Consumer) users.get(userPos);
+            Consumer user = (Consumer) getUsers().get(userPos);
             for (int i = 0; i < audios.size(); i++) {
                 Audio currentAudio = audios.get(i);
                 if (currentAudio instanceof Song) {
@@ -474,12 +483,12 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         if (userPos != -1) {
             msg = "This user has no playlists.";
-            User user = users.get(userPos);
+            User user = getUsers().get(userPos);
             if (user instanceof Consumer) {
                 Audio audio = getAudio(audioId);
                 msg = "Non-existent audio";
                 if (audio != null) {
-                    msg = ((Consumer) users.get(userPos)).addAudioTo(playlistId, audio);
+                    msg = ((Consumer) getUsers().get(userPos)).addAudioTo(playlistId, audio);
                 }
             }
         }
@@ -499,12 +508,12 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         if (userPos != -1) {
             msg = "This user has no playlists.";
-            User user = users.get(userPos);
+            User user = getUsers().get(userPos);
             if (user instanceof Consumer) {
                 Audio audio = getAudio(audioId);
                 msg = "Non-existent audio";
                 if (audio != null) {
-                    msg = ((Consumer) users.get(userPos)).removeAudioFrom(playlistId, audio);
+                    msg = ((Consumer) getUsers().get(userPos)).removeAudioFrom(playlistId, audio);
                 }
             }
         }
@@ -524,9 +533,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         if (userPos != -1) {
             msg = "This user has no playlists.";
-            User user = users.get(userPos);
+            User user = getUsers().get(userPos);
             if (user instanceof Consumer) {
-                msg = ((Consumer) users.get(userPos)).changeNameTo(playlistId, newName);
+                msg = ((Consumer) getUsers().get(userPos)).changeNameTo(playlistId, newName);
             }
         }
         return msg;
@@ -546,9 +555,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         if (userPos != -1) {
             msg = "This user has no playlists.";
-            User user = users.get(userPos);
+            User user = getUsers().get(userPos);
             if (user instanceof Consumer) {
-                msg = ((Consumer) users.get(userPos)).changePositionOf(playlistId, oldPosition, newPosition);
+                msg = ((Consumer) getUsers().get(userPos)).changePositionOf(playlistId, oldPosition, newPosition);
             }
         }
         return msg;
@@ -566,9 +575,9 @@ public class Controller {
         int userPos = getUserPosition(nickname);
         if (userPos != -1) {
             msg = "This user has no playlists.";
-            User user = users.get(userPos);
+            User user = getUsers().get(userPos);
             if (user instanceof Consumer) {
-                msg = ((Consumer) users.get(userPos)).deletePlaylist(playlistId);
+                msg = ((Consumer) getUsers().get(userPos)).deletePlaylist(playlistId);
             }
         }
         return msg;
@@ -576,9 +585,9 @@ public class Controller {
 
     public Playlist getPlaylistById(String id) {
         Playlist playlist = null;
-        for (int i = 0; i < users.size() && playlist == null; i++) {
-            if (users.get(i) instanceof Consumer) {
-                playlist = ((Consumer) users.get(i)).getPlaylist(id);
+        for (int i = 0; i < getUsers().size() && playlist == null; i++) {
+            if (getUsers().get(i) instanceof Consumer) {
+                playlist = ((Consumer) getUsers().get(i)).getPlaylist(id);
             }
         }
         return playlist;
@@ -588,10 +597,10 @@ public class Controller {
         String msg = null;
         int pos = getUserPosition(nickname);
         if (pos != -1) {
-            if (users.get(pos) instanceof Standard) {
+            if (getUsers().get(pos) instanceof Standard) {
                 Audio audio = getAudio(audioID);
                 if (audio != null) {
-                    msg = ((Standard) users.get(pos)).increaseAdPercentage(audio instanceof Podcast ? 1 : 0.4);
+                    msg = ((Standard) getUsers().get(pos)).increaseAdPercentage(audio instanceof Podcast ? 1 : 0.4);
                 }
             }
         }
@@ -620,11 +629,11 @@ public class Controller {
         String msg = "Non-existent user";
         if (pos != -1) {
             msg = "This user is not a consumer";
-            if (users.get(pos) instanceof Consumer) {
+            if (getUsers().get(pos) instanceof Consumer) {
                 msg = "The audio doesn't exist";
                 if (getAudio(songID) != null) {
-                    if (((Consumer) users.get(pos)).canPurchaseASong()) {
-                        ((Consumer) users.get(pos)).addPurchasedSong(songID);
+                    if (((Consumer) getUsers().get(pos)).canPurchaseASong()) {
+                        ((Consumer) getUsers().get(pos)).addPurchasedSong(songID);
                         msg = "Song successfully bought";
                     }
                 }
@@ -639,8 +648,8 @@ public class Controller {
         if (playedAudio != null) {
             int posOwner = getUserPosition(playedAudio.getOwner());
             if (posOwner != -1) {
-                if (users.get(posOwner) instanceof Producer) {
-                    ((Producer) users.get(posOwner)).playedAudio(audioID);
+                if (getUsers().get(posOwner) instanceof Producer) {
+                    ((Producer) getUsers().get(posOwner)).playedAudio(audioID);
                 }
             }
         }
@@ -649,9 +658,9 @@ public class Controller {
     public String getTotalReproductionsByType() {
         String msg = "";
         Map<String, Integer> dir = new HashMap<String, Integer>();
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i) instanceof Producer) {
-                ((Producer) users.get(i)).audioTypeStadistics().forEach((key, value) -> {
+        for (int i = 0; i < getUsers().size(); i++) {
+            if (getUsers().get(i) instanceof Producer) {
+                ((Producer) getUsers().get(i)).audioTypeStadistics().forEach((key, value) -> {
                     dir.put(key, dir.get(key) != null ? dir.get(key) + value : value);
                 });
             }
@@ -665,9 +674,9 @@ public class Controller {
     public String getMostPlayedByClassification(Class<?> type) {
         String msg = "";
         Map<String, Integer> dir = new HashMap<String, Integer>();
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i) instanceof Producer) {
-                ((Producer) users.get(i)).classificationStadistics(type)
+        for (int i = 0; i < getUsers().size(); i++) {
+            if (getUsers().get(i) instanceof Producer) {
+                ((Producer) getUsers().get(i)).classificationStadistics(type)
                         .forEach((key, value) -> dir.put(key, dir.get(key) != null ? dir.get(key) + value : value));
             }
         }
@@ -688,11 +697,11 @@ public class Controller {
         int pos = getUserPosition(nickname);
         if (pos != -1) {
             msg = "This user is not a producer";
-            if (users.get(pos) instanceof Producer) {
+            if (getUsers().get(pos) instanceof Producer) {
                 msg = "";
                 for (Class<?> type : getAudioClassification()) {
                     Map<String, Integer> dir = new HashMap<String, Integer>();
-                    ((Producer) users.get(pos)).classificationStadistics(type)
+                    ((Producer) getUsers().get(pos)).classificationStadistics(type)
                             .forEach((key, value) -> dir.put(key, dir.get(key) != null ? dir.get(key) + value : value));
                     int greater = 0;
 
@@ -712,6 +721,38 @@ public class Controller {
                 msg = msg.substring(0, msg.length() - 3);
             }
         }
+        return msg;
+    }
+
+    public String producersRanking() {
+        String msg = "";
+
+        List<User> ranking = new ArrayList<User>(getUsers());
+        ranking.removeIf(user -> !(user instanceof Producer));
+        Collections.sort(ranking);
+
+        List<User> artists = new ArrayList<User>(ranking);
+        List<User> creators = new ArrayList<User>(ranking);
+
+        artists.removeIf(user -> !(user instanceof Artist));
+        creators.removeIf(user -> !(user instanceof Creator));
+
+        if (!artists.isEmpty()) {
+            msg += "\nTop artists:\n\n";
+            for (int i = 0; i < artists.size() && i < 5; i++) {
+                msg += (i + 1) + ". " + ((Producer) artists.get(i)).toString() + "\n";
+            }
+            msg += "\n";
+        }
+
+        if (!creators.isEmpty()) {
+            msg += "\nTop content creators:\n\n";
+            for (int i = 0; i < creators.size() && i < 5; i++) {
+                msg += (i + 1) + ". " + ((Producer) creators.get(i)).toString() + "\n";
+            }
+            msg += "\n";
+        }
+
         return msg;
     }
 

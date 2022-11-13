@@ -79,4 +79,35 @@ public abstract class Producer extends User {
         }
         return stadistics;
     }
+
+    public int totalReproductions(){
+        int count = 0;
+        for (Audio audio : audios) {
+            count += audio.getTimesReproduced();
+        }
+        return count;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        int result = super.compareTo(o);
+        if(o instanceof Producer){
+            int reproductions = totalReproductions();
+            int compareReproductions = ((Producer) o).totalReproductions();
+            if(reproductions > compareReproductions){
+                result = -1;
+            }else if(reproductions == compareReproductions){
+                result = 0;
+            }else{
+                result = 1;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String toString(){
+        return name + " - Total reproductions: " + totalReproductions(); 
+    }
+
 }

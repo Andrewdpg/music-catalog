@@ -37,6 +37,7 @@ public class Menu {
             "8. Buy a song.\n" +
             "9. Total reproductions by audio type. \n" +
             "10. Most reproduced by classification. \n" +
+            "11. Producers ranking. \n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -109,6 +110,12 @@ public class Menu {
                 msg = controller.getTotalReproductionsByType();
                 break;
             case 10:
+                msg = mostPlayedByClassification();
+                break;
+            case 11:
+                msg = controller.producersRanking();
+                break;
+            case 12:
                 msg = mostPlayedByClassification();
                 break;
             case 0:
