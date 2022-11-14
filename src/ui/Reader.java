@@ -16,6 +16,16 @@ public class Reader {
         return value;
     }
 
+    public static double readDouble(){
+        double value = -1;
+        if(scn.hasNextDouble()){
+            value = scn.nextDouble();
+        }else{
+            scn.next();
+        }
+        return value;
+    }
+
     public static String readString() {
         return scn.next();
     }

@@ -42,9 +42,12 @@ public class Controller {
 
         for (int i = 0; i < 20; i++) {
             if (i % 2 == 0) {
-                Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, getUsers().get(1).getNickname());
-                Audio audio2 = new Song("S-" + (i+20), "asdfasdfasdf", 10000, Genre.ROCK, getUsers().get(2).getNickname());
-                Audio audio3 = new Song("S-" + (i+40), "asdfasdfasdf", 10000, Genre.HOUSE, getUsers().get(0).getNickname());
+                Audio audio = new Song("S-" + i, "asdfasdfasdf", 10000, Genre.POP, getUsers().get(1).getNickname(),
+                        5.0);
+                Audio audio2 = new Song("S-" + (i + 20), "asdfasdfasdf", 10000, Genre.ROCK,
+                        getUsers().get(2).getNickname(), 4.3);
+                Audio audio3 = new Song("S-" + (i + 40), "asdfasdfasdf", 10000, Genre.HOUSE,
+                        getUsers().get(0).getNickname(), 11.99);
                 ((Producer) getUsers().get(1)).addAudio(audio);
                 ((Producer) getUsers().get(2)).addAudio(audio2);
                 ((Producer) getUsers().get(0)).addAudio(audio3);
@@ -52,10 +55,10 @@ public class Controller {
                 Audio audio = new Podcast("P-" + i, "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.ENTERTAIMENT, getUsers().get(0).getNickname());
-                Audio audio2 = new Podcast("P-" + (i+20), "asdfasdfasdf", 5000,
+                Audio audio2 = new Podcast("P-" + (i + 20), "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.POLITICS, getUsers().get(3).getNickname());
-                Audio audio3 = new Podcast("P-" + (i+40), "asdfasdfasdf", 5000,
+                Audio audio3 = new Podcast("P-" + (i + 40), "asdfasdfasdf", 5000,
                         "SeSuponeque esto es una descripción",
                         Category.FASHION, getUsers().get(5).getNickname());
                 ((Producer) getUsers().get(0)).addAudio(audio);
@@ -64,7 +67,7 @@ public class Controller {
             }
         }
 
-        Standard user = new Standard("a", "a");
+        Standard user = new Standard("s", "s");
         Premium user1 = new Premium("p", "p");
 
         List<Class<?>> typeList = new ArrayList<Class<?>>();
@@ -75,31 +78,18 @@ public class Controller {
         String code = UtilMatrix.generateCode(3, matrix);
         user.addPlaylist(new Playlist("No c", typeList, matrix, code));
 
-        List<Audio> audios = getAllAudios();
-        user.addPurchasedSong(audios.get(0).getId());
-        user.addPurchasedSong(audios.get(3).getId());
-        user.addPurchasedSong(audios.get(1).getId());
-        user.addPurchasedSong(audios.get(2).getId());
-        user.addPurchasedSong(audios.get(7).getId());
-        user.addAudioTo(code, audios.get(0));
-        user.addAudioTo(code, audios.get(3));
-        user.addAudioTo(code, audios.get(1));
-        user.addAudioTo(code, audios.get(2));
-        user.addAudioTo(code, audios.get(7));
-
-        user1.addPurchasedSong(audios.get(0).getId());
-        user1.addPurchasedSong(audios.get(3).getId());
-        user1.addPurchasedSong(audios.get(1).getId());
-        user1.addPurchasedSong(audios.get(2).getId());
-        user1.addPurchasedSong(audios.get(7).getId());
-        user1.addAudioTo(code, audios.get(0));
-        user1.addAudioTo(code, audios.get(3));
-        user1.addAudioTo(code, audios.get(1));
-        user1.addAudioTo(code, audios.get(2));
-        user1.addAudioTo(code, audios.get(7));
-
         getUsers().add(user);
         getUsers().add(user1);
+
+        List<Audio> audios = getAllAudios();
+
+        buySongFor("s", audios.get(0).getId());
+        buySongFor("s", audios.get(2).getId());
+        addAudioToUserPlaylist("s", code, audios.get(0).getId());
+        addAudioToUserPlaylist("s", code, audios.get(2).getId());
+
+        buySongFor("p", audios.get(0).getId());
+        buySongFor("p", audios.get(2).getId());
 
     }
 
@@ -236,8 +226,8 @@ public class Controller {
      * @param nickname owner's/artist's nickname
      * @return A message with the final result
      */
-    public String registerSong(String name, int duration, String imageURL, Genre type, String nickname) {
-        return addAudio(nickname, new Song(name, imageURL, duration, type, nickname));
+    public String registerSong(String name, int duration, String imageURL, Genre type, String nickname, double price) {
+        return addAudio(nickname, new Song(name, imageURL, duration, type, nickname, price));
     }
 
     /**
@@ -630,10 +620,13 @@ public class Controller {
         if (pos != -1) {
             msg = "This user is not a consumer";
             if (getUsers().get(pos) instanceof Consumer) {
+                Audio audio = getAudio(songID);
                 msg = "The audio doesn't exist";
-                if (getAudio(songID) != null) {
+                if (audio != null) {
                     if (((Consumer) getUsers().get(pos)).canPurchaseASong()) {
                         ((Consumer) getUsers().get(pos)).addPurchasedSong(songID);
+                        pos = getUserPosition(audio.getOwner());
+                        ((Artist) users.get(pos)).addSale(audio);
                         msg = "Song successfully bought";
                     }
                 }
@@ -787,6 +780,35 @@ public class Controller {
         }
 
         return msg;
+    }
+
+    public String getTotalSales() {
+        String out = "";
+
+        List<Audio> list = getAudiosOfType(Song.class);
+        Map<String, Integer> salesDir = new HashMap<String, Integer>();
+        Map<String, Double> earningsDir = new HashMap<String, Double>();
+
+        String classification = "";
+        int sales = 0;
+        double earnings = 0.0;
+        for (int i = 0; i < list.size(); i++) {
+            classification = list.get(i).getClassication().name();
+            sales = ((Song) list.get(i)).getSales();
+            earnings = ((Song) list.get(i)).getErnings();
+
+            salesDir.put(classification,
+                    salesDir.get(classification) != null ? salesDir.get(classification) + sales : sales);
+            earningsDir.put(classification,
+                    earningsDir.get(classification) != null ? earningsDir.get(classification) + earnings : earnings);
+        }
+
+        for (String key : salesDir.keySet()) {
+            out += key + ": \n - Total sales: " + salesDir.get(key) + "\n - Total earnings: " + earningsDir.get(key)
+                    + "\n\n";
+        }
+
+        return out;
     }
 
 }

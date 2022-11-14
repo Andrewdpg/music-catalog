@@ -39,6 +39,8 @@ public class Menu {
             "10. Most reproduced by classification. \n" +
             "11. Producers ranking. \n" +
             "12. Audios ranking. \n" +
+            "13. Total sales. \n" +
+            "14. Top selling song \n" +
             "0. Exit.\n" +
             "Input: ";
     // Options for editing a playlist.
@@ -119,6 +121,9 @@ public class Menu {
             case 12:
                 msg = controller.audiosRanking();
                 break;
+            case 13:
+                msg = controller.getTotalSales();
+                break;
             case 0:
                 msg = "Closing....";
                 break;
@@ -171,16 +176,21 @@ public class Menu {
                 if (availableSongs != null) {
                     System.out.print("\n" + listToString(availableSongs) + "\n0. Cancel\n\nInput: ");
                     int input = Reader.readInt();
-                    msg = "";
+                    msg = "Invalid input";
                     if (input >= 1 && input <= availableSongs.size()) {
-                        msg = controller.buySongFor(user.getNickname(), availableSongs.get(input - 1).getId());
-                    } else {
-                        msg = "invalid input";
+                        System.out.print("\nConfirm purchase for " + availableSongs.get(input - 1).getPrice()
+                                + "$? \n1. Confirm\n2. Cancel\nInput: ");
+                        int confirmation = Reader.readInt();
+                        msg = "Cancelled";
+                        if (confirmation == 1) {
+                            msg = controller.buySongFor(user.getNickname(), availableSongs.get(input - 1).getId());
+                        } else if (confirmation != 2) {
+                            msg = "Invalid input";
+                        }
                     }
                 }
             }
         }
-
         return msg;
     }
 
@@ -471,7 +481,7 @@ public class Menu {
         if (user instanceof Producer) {
             System.out.print("What's the audio name? ");
             String name = Reader.readString();
-            System.out.print("How long the audio is? ");
+            System.out.print("How long the audio is? (seconds) ");
             int duration = Reader.readInt();
             System.out.print("What's the audio image url? ");
             String imageURL = Reader.readString();
@@ -479,9 +489,19 @@ public class Menu {
             if (user instanceof Artist) {
                 System.out.print("What's the genre of the song?\n" + controller.getEnumTypes(Genre.class));
                 Object type = validateType(Reader.readInt(), Genre.class);
+                System.out.print("What is its price? ");
+                double price = Reader.readDouble();
 
-                msg = type instanceof Genre ? controller.registerSong(name, duration, imageURL, (Genre) type, nickname)
-                        : String.valueOf(type);
+                msg = "Invalid price";
+                if (price >= 0) {
+                    msg = "Invalid duration";
+                    if (duration > 0) {
+                        msg = type instanceof Genre
+                                ? controller.registerSong(name, duration * 1000, imageURL, (Genre) type, nickname,
+                                        price)
+                                : String.valueOf(type);
+                    }
+                }
 
             } else if (user instanceof Creator) {
                 System.out.print("Give a brief description: ");
