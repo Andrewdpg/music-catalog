@@ -805,7 +805,24 @@ public class Controller {
 
         for (String key : salesDir.keySet()) {
             out += key + ": \n - Total sales: " + salesDir.get(key) + "\n - Total earnings: " + earningsDir.get(key)
-                    + "\n\n";
+                    + "$\n\n";
+        }
+
+        return out;
+    }
+
+    public String getTopSellingSong() {
+        String out = "";
+        List<Audio> list = getAudiosOfType(Song.class);
+        int higher = -1;
+        for (int i = 0; i < list.size(); i++) {
+            Song current = (Song) list.get(i);
+            if(current.getSales() > higher){
+                higher = current.getSales();
+                out = current.toString() + " // Sales: " + current.getSales() + " // Earnings: " + (current.getSales() * current.getPrice()) + "$\n";
+            }else if(current.getSales() == higher){
+                out += current.toString() + " // Sales: " + current.getSales() + " // Earnings: " + (current.getSales() * current.getPrice()) + "$\n";
+            }
         }
 
         return out;

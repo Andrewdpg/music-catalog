@@ -124,6 +124,9 @@ public class Menu {
             case 13:
                 msg = controller.getTotalSales();
                 break;
+            case 14:
+                msg = controller.getTopSellingSong();
+                break;
             case 0:
                 msg = "Closing....";
                 break;
