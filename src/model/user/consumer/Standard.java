@@ -15,6 +15,11 @@ public final class Standard extends Consumer {
         this.adPercentage = 0.0;
     }
 
+    /**
+     * Increases the load of an Ad. iof the percentage is over 1 (100%), it will return an Ad.
+     * @param percengate percentage to increase
+     * @return An ad in case it reacehs 100%, empty String otherwise.
+     */
     public String increaseAdPercentage(double percengate) {
         String value = "";
         adPercentage += percengate;

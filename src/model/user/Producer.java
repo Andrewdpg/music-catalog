@@ -45,6 +45,11 @@ public abstract class Producer extends User {
         return this.audios.add(audio);
     }
 
+    /**
+     * Increases the reproductions of an audio
+     * 
+     * @param audioID id of the audio to increase reproductions
+     */
     public void playedAudio(String audioID) {
         for (int i = 0; i < audios.size(); i++) {
             if (audios.get(i).getId().equals(audioID)) {
@@ -54,6 +59,12 @@ public abstract class Producer extends User {
         }
     }
 
+    /**
+     * Returns a map with the stadistics of all of ist audios by its types
+     * (Podcasts, Songs....)
+     * 
+     * @return Map with stadistics
+     */
     public Map<String, Integer> audioTypeStadistics() {
         Map<String, Integer> stadistics = new HashMap<String, Integer>();
         int currentCount = 0;
@@ -66,12 +77,19 @@ public abstract class Producer extends User {
         return stadistics;
     }
 
-    public Map<String,Integer> classificationStadistics(Class<?> type){
+    /**
+     * Returns a map with the stadistics of all of ist audios by its classification
+     * (Genre, Category....)
+     * 
+     * @param type classification to be mapped (Genre.class, Category.class....)
+     * @return Map with stadistics
+     */
+    public Map<String, Integer> classificationStadistics(Class<?> type) {
         Map<String, Integer> stadistics = new HashMap<String, Integer>();
         int currentCount = 0;
         String currentClass = "";
         for (int i = 0; i < audios.size(); i++) {
-            if(audios.get(i).getClassication().getClass() == type){
+            if (audios.get(i).getClassication().getClass() == type) {
                 currentClass = audios.get(i).getClassication().name();
                 currentCount = stadistics.get(currentClass) != null ? stadistics.get(currentClass) : 0;
                 stadistics.put(currentClass, currentCount + audios.get(i).getTimesReproduced());
@@ -80,7 +98,12 @@ public abstract class Producer extends User {
         return stadistics;
     }
 
-    public int totalReproductions(){
+    /**
+     * Counts the total of reproductions of all of its audios
+     * 
+     * @return Total count
+     */
+    public int totalReproductions() {
         int count = 0;
         for (Audio audio : audios) {
             count += audio.getTimesReproduced();
@@ -91,14 +114,14 @@ public abstract class Producer extends User {
     @Override
     public int compareTo(User o) {
         int result = super.compareTo(o);
-        if(o instanceof Producer){
+        if (o instanceof Producer) {
             int reproductions = totalReproductions();
             int compareReproductions = ((Producer) o).totalReproductions();
-            if(reproductions > compareReproductions){
+            if (reproductions > compareReproductions) {
                 result = -1;
-            }else if(reproductions == compareReproductions){
+            } else if (reproductions == compareReproductions) {
                 result = 0;
-            }else{
+            } else {
                 result = 1;
             }
         }
@@ -106,8 +129,8 @@ public abstract class Producer extends User {
     }
 
     @Override
-    public String toString(){
-        return name + " - Total reproductions: " + totalReproductions(); 
+    public String toString() {
+        return name + " - Total reproductions: " + totalReproductions();
     }
 
 }

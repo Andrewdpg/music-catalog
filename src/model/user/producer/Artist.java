@@ -10,6 +10,10 @@ public final class Artist extends Producer {
         super(nickname, name, imageURL);
     }
 
+    /**
+     * Increases the selling count for a specific Audio
+     * @param audio Audio that was sold 
+     */
     public void addSale(Audio audio) {
         if (getAudios().get(getAudios().indexOf(audio)) instanceof Song) {
             ((Song) getAudios().get(getAudios().indexOf(audio))).increaseSales();

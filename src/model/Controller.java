@@ -97,6 +97,11 @@ public class Controller {
         return this.users;
     }
 
+    /**
+     * Searches for all of the audios in each Producer.
+     * 
+     * @return List with all of registered audios
+     */
     public List<Audio> getAllAudios() {
         List<Audio> out = new ArrayList<Audio>();
 
@@ -109,6 +114,12 @@ public class Controller {
         return out;
     }
 
+    /**
+     * Returns a list with aall of the audios of a specific class {Podcast, Song...}
+     * 
+     * @param classType The audio class to be searched for
+     * @return List with all of the audios of the given class.
+     */
     public List<Audio> getAudiosOfType(Class<?> classType) {
         List<Audio> list = getAllAudios();
         list.removeIf(audio -> (audio.getClass() != classType));
@@ -130,6 +141,12 @@ public class Controller {
         return position;
     }
 
+    /**
+     * Searches for an user by its nickname
+     * 
+     * @param nickname nickname of the user to search
+     * @return User object in case it exist. null otherwise.
+     */
     public User getUser(String nickname) {
         User user = null;
         for (int i = 0; i < getUsers().size() && user == null; i++) {
@@ -224,6 +241,7 @@ public class Controller {
      * @param imageURL song's image
      * @param type     song's genre
      * @param nickname owner's/artist's nickname
+     * @param price Selling price
      * @return A message with the final result
      */
     public String registerSong(String name, int duration, String imageURL, Genre type, String nickname, double price) {
@@ -436,7 +454,6 @@ public class Controller {
      * Returns a list of available audios for a certain user.
      * 
      * @param nickname   User's nickname
-     * @param audioTypes Audio types to be retreived
      * @return List of available audios for the selected user.
      */
     public List<Audio> audiosForUser(String nickname) {
@@ -573,6 +590,12 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Searches for a playlist by its id
+     * 
+     * @param id id of the playlist to search for
+     * @return the playlist object in case it exist. null otherwise
+     */
     public Playlist getPlaylistById(String id) {
         Playlist playlist = null;
         for (int i = 0; i < getUsers().size() && playlist == null; i++) {
@@ -583,6 +606,15 @@ public class Controller {
         return playlist;
     }
 
+    /**
+     * Increases the count for reproducing an Ad of an user.
+     * 
+     * @param nickname nickname of the user to increase the Ad count
+     * @param audioID  ID of the reproduced audio, to know how much it must be added
+     *                 to the Ad count.
+     * @return An Ad in case the user already reaches the limit. A null value
+     *         otherwise.
+     */
     public String increaseAdPercentageTo(String nickname, String audioID) {
         String msg = null;
         int pos = getUserPosition(nickname);
@@ -597,6 +629,12 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Returns a list of songs that an user does not already own.
+     * 
+     * @param nickname nickname of the user.
+     * @return List of songs available to be bought by the specified user.
+     */
     public List<Song> getAvailableSongsForPurchase(String nickname) {
         List<Audio> songs = getAudiosOfType(Song.class);
         List<Song> availableSongs = new ArrayList<Song>();
@@ -613,6 +651,13 @@ public class Controller {
         return availableSongs;
     }
 
+    /**
+     * Purchases a song for an specific user.
+     * 
+     * @param nickname nickname of the buyer
+     * @param songID   Song to be bought
+     * @return A message with the purchase result.
+     */
     public String buySongFor(String nickname, String songID) {
         int pos = getUserPosition(nickname);
 
@@ -636,7 +681,12 @@ public class Controller {
         return msg;
     }
 
-    public void userPlayed(String nickname, String audioID) {
+    /**
+     * Adds a reproduction to the count of an specific Audio
+     * 
+     * @param audioID Audio which got played
+     */
+    public void userPlayed(String audioID) {
         Audio playedAudio = getAudio(audioID);
         if (playedAudio != null) {
             int posOwner = getUserPosition(playedAudio.getOwner());
@@ -648,6 +698,13 @@ public class Controller {
         }
     }
 
+    /**
+     * Counts the total reproduction of each type (class) of audio and attach it in
+     * a String
+     * 
+     * @return String showing all of the audio classes {Podcast, Song...} and its
+     *         total reproductions
+     */
     public String getTotalReproductionsByType() {
         String msg = "";
         Map<String, Integer> dir = new HashMap<String, Integer>();
@@ -664,6 +721,14 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Counts the total reproductions of each type of classification (Song
+     * classification = Genre, Podcast classification = Category...)
+     * 
+     * @param type The type of classification to search for (Genre, Category....)
+     * @return A string with each classification enum value, and its total
+     *         reproductions count
+     */
     public String getMostPlayedByClassification(Class<?> type) {
         String msg = "";
         Map<String, Integer> dir = new HashMap<String, Integer>();
@@ -685,6 +750,15 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Counts the total reproductions of each type of classification (Song
+     * classification = Genre, Podcast classification = Category...) of a specific
+     * Producer and returns just the most reproduced one.
+     * 
+     * @param nickname The user to look for
+     * @return A string with each classification enum value, and its total
+     *         reproductions count
+     */
     public String getMostPlayedClassificationOf(String nickname) {
         String msg = "Non-existent user";
         int pos = getUserPosition(nickname);
@@ -711,12 +785,18 @@ public class Controller {
                         msg += "\n\n";
                     }
                 }
-                msg = msg.substring(0, msg.length() - 3);
+                msg = msg.substring(0, msg.length() - 2);
             }
         }
         return msg;
     }
 
+    /**
+     * Organizes the Artists and Content creators by its total reproductions and
+     * returns the top 5 of each one.
+     * 
+     * @return A string list with the rankings
+     */
     public String producersRanking() {
         String msg = "";
 
@@ -749,6 +829,12 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Organizes the Podcasts and Songs by its total reproductions and
+     * returns the top 10 of each one.
+     * 
+     * @return A string list with the rankings
+     */
     public String audiosRanking() {
         String msg = "";
 
@@ -782,6 +868,12 @@ public class Controller {
         return msg;
     }
 
+    /**
+     * Counts the total of sales of the entire platform and counts the income of
+     * each Audio.
+     * 
+     * @return Total sales of the entire platform
+     */
     public String getTotalSales() {
         String out = "";
 
@@ -811,17 +903,25 @@ public class Controller {
         return out;
     }
 
+    /**
+     * Looks for the song with more sellings and returns it. In case there is two of
+     * them with the same amount, it returns both.
+     * 
+     * @return Top selling song
+     */
     public String getTopSellingSong() {
         String out = "";
         List<Audio> list = getAudiosOfType(Song.class);
         int higher = -1;
         for (int i = 0; i < list.size(); i++) {
             Song current = (Song) list.get(i);
-            if(current.getSales() > higher){
+            if (current.getSales() > higher) {
                 higher = current.getSales();
-                out = current.toString() + " // Sales: " + current.getSales() + " // Earnings: " + (current.getSales() * current.getPrice()) + "$\n";
-            }else if(current.getSales() == higher){
-                out += current.toString() + " // Sales: " + current.getSales() + " // Earnings: " + (current.getSales() * current.getPrice()) + "$\n";
+                out = current.toString() + " // Sales: " + current.getSales() + " // Earnings: "
+                        + (current.getSales() * current.getPrice()) + "$\n";
+            } else if (current.getSales() == higher) {
+                out += current.toString() + " // Sales: " + current.getSales() + " // Earnings: "
+                        + (current.getSales() * current.getPrice()) + "$\n";
             }
         }
 

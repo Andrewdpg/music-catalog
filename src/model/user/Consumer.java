@@ -11,13 +11,11 @@ import model.Audio;
 import model.User;
 import model.audio.Playlist;
 import model.audio.Song;
-import model.user.consumer.Preferences;
 
 public abstract class Consumer extends User {
 
     private List<Playlist> playlists;
     private Map<String, Timestamp> purchasedSongs;
-    private Preferences preferences;
     private String id;
 
     public Consumer(String nickname, String id) {
@@ -25,7 +23,6 @@ public abstract class Consumer extends User {
         this.id = id;
         this.playlists = new ArrayList<Playlist>();
         this.purchasedSongs = new HashMap<String, Timestamp>();
-        this.preferences = new Preferences();
     }
 
     /**
@@ -81,10 +78,6 @@ public abstract class Consumer extends User {
         return purchasedSongs;
     }
 
-    public Preferences getPreferences() {
-        return preferences;
-    }
-
     public String getId() {
         return id;
     }
@@ -93,18 +86,39 @@ public abstract class Consumer extends User {
         this.id = id;
     }
 
+    /**
+     * Validates if the user is able to buy another song
+     * 
+     * @return True if it has not reached its limit (True by default)
+     */
     public boolean canPurchaseASong() {
         return true;
     }
 
+    /**
+     * Validates if the user is able to create another playlist
+     * 
+     * @return True if it has not reached its limit (True by default)
+     */
     public boolean canCreateAPlaylist() {
         return true;
     }
 
+    /**
+     * Adds a purchased song to its directory
+     * 
+     * @param songId Bought song id
+     */
     public void addPurchasedSong(String songId) {
         purchasedSongs.put(songId, Timestamp.from(Instant.now()));
     }
 
+    /**
+     * Validates if it already owns a song
+     * 
+     * @param id id of the song to validate
+     * @return True in case it already owns it. false otherwise.
+     */
     public boolean boughtSong(String id) {
         return purchasedSongs.containsKey(id);
     }

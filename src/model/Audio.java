@@ -94,20 +94,25 @@ public abstract class Audio implements IPlayable, Comparable<Audio> {
         }
     }
 
+    /**
+     * Returns its classification enum value in case it has one (Genre.SOME_VALUE,
+     * Category.SOME_VALUE...)
+     * 
+     * @return The enum value of the audio
+     */
     public abstract Enum<?> getClassication();
 
     @Override
     public int compareTo(Audio o) {
         int result = 0;
-        if(getTimesReproduced() > o.getTimesReproduced()){
+        if (getTimesReproduced() > o.getTimesReproduced()) {
             result = -1;
-        }else if(getTimesReproduced() == o.getTimesReproduced()){
+        } else if (getTimesReproduced() == o.getTimesReproduced()) {
             result = 0;
-        }else{
+        } else {
             result = 1;
         }
         return result;
     }
 
-    
 }

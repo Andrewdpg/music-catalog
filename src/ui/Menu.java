@@ -137,6 +137,13 @@ public class Menu {
         System.out.println(msg);
     }
 
+    /**
+     * Shows the ranking by reproductions classified by {Genre or Category}. Asks
+     * the user to choose between showing the entire platform ranking, or showing
+     * only an specific producer ranking.
+     * 
+     * @return Ranking of each classification as a String
+     */
     public String mostPlayedByClassification() {
         String msg = null;
         System.out.print("\n1. An specific user.\n2. The entire platform.\nInput: ");
@@ -167,6 +174,13 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Asks the user for a nickname of a consumer. Then request to the controller
+     * for a list of songs that this havent bought yet. Finally prints this list and
+     * asks the user so pick one to buy.
+     * 
+     * @return a message with the result of the purchasing proccess
+     */
     public String buyASong() {
         User user = controller.getUser(readUserNickname());
 
@@ -197,6 +211,13 @@ public class Menu {
         return msg;
     }
 
+    /**
+     * Asks the user for a nickname of a connsumer. Then request to the controller
+     * for a list of audios which this user can play (podcasts and bought songs) and
+     * prints it. Finally, request to the user to select one of the list and
+     * simulates
+     * the reprouction of it
+     */
     public void playAudios() {
         String nickname = readUserNickname();
 
@@ -212,7 +233,7 @@ public class Menu {
                     if (ad != null) {
                         System.out.println(ad + "\n");
                     }
-                    controller.userPlayed(nickname, availableAudios.get(input - 1).getId());
+                    controller.userPlayed(availableAudios.get(input - 1).getId());
                     availableAudios.get(input - 1).play();
                 }
 
@@ -225,6 +246,13 @@ public class Menu {
 
     }
 
+    /**
+     * Asks the user for a playlist id, searches for that playlist at the controller
+     * and returns it as a String
+     * 
+     * @return Playlist as a String in case it is found. A not found message
+     *         otherwise.
+     */
     public String searchPlaylistById() {
         String msg = "Playlist not found.";
         System.out.print("What's the playlist id? ");
